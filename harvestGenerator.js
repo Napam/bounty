@@ -1,4 +1,4 @@
-const axios = require('axios').default
+import axios from 'axios'
 const headers = {
   'Harvest-Account-ID': 612538,
   'Authorization': 'Bearer 2819713.pt.jXoa1h9By8c_qrOdFuqGtwJpM3v9zJB61RclThVmMnacUtmdkJnFSALiQxBgECP24Crh650j9SR766VrhYlLkQ'
@@ -25,5 +25,13 @@ const taskLeavePaid = {
     id: 17810723,
     name: 'Leave - Paid'
   }
+}
+
+function iterator(config) {
+
+}
+
+export default {
+  iterator,
 }
 
