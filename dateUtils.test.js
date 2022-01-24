@@ -1,7 +1,7 @@
 // const { expect } = require("@jest/globals")
 // const dateutils = require('./dateutils')
 import { expect } from "@jest/globals"
-import dateutils from './dateutils'
+import dateutils from './dateUtils.js'
 
 test('offsetDate works', () => {
   const date = dateutils.offsetDate(new Date(2022, 11, 18), {

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import setup from './setup'
+
+import setup from './setup.js'
 
 async function run() {
   setup.run()
