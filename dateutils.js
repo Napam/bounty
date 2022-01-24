@@ -336,8 +336,9 @@ export default {
   UNIQUE_DAYS
 }
 
-if (typeof require !== 'undefined' && require.main === module) {
-  countDaysDraw = (from, to) => ({
+import { fileURLToPath } from "url";
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const countDaysDraw = (from, to) => ({
     1: '#'.repeat((from.getDay() + 5) % 7),
     2: '#'.repeat((from.getDay() + 4) % 7),
     3: '#'.repeat((from.getDay() + 3) % 7),
