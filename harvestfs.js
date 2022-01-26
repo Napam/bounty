@@ -39,10 +39,18 @@ function setData(config, path = BOUNTY_DATA) {
   fs.writeFileSync(path, JSON.stringify(config, null, 4))
 }
 
+function clean(path = BOUNTY_DIR) {
+  fs.rmSync(path, { recursive: true, force: true })
+}
+
 export default {
-  setup,
+  clean,
   getConfig,
-  setupFilesInHome
+  getData,
+  setConfig,
+  setData,
+  setup,
+  setupFilesInHome,
 }
 
 import { fileURLToPath } from "url";

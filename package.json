@@ -1,4 +1,5 @@
 {
+    "name": "bounty",
     "devDependencies": {
         "jest": "^27.4.7"
     },
@@ -8,5 +9,8 @@
     },
     "bin": {
         "bounty": "./index.js"
+    },
+    "dependencies": {
+        "axios": "^0.25.0"
     }
 }

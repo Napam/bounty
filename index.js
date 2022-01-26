@@ -1,27 +1,34 @@
 #!/usr/bin/env node
 
-import bountyfs from './bountyfs.js'
-// import dataGetter from './harvestGenerator.js'
-const CONFIG_SCHEMA = {
-  'serviceName': null,
-  'id': null,
-  'authorization': null
-}
+import dateUtils from './dateUtils.js'
 
-const DATA_SCHEMA = {
-  'initReferenceDate': null,
-  'initReferenceBalance': null,
-  'currReferenceDate': null,
-  'currReferenceBalance': null
-}
+import {
+  setup,
+  getWorkHours,
+  getReferenceDate,
+  getReferenceBalance,
+} from './harvestContext.js'
 
 async function run() {
-  bountyfs.setup(CONFIG_SCHEMA, DATA_SCHEMA)
-  console.log('bountyfs.getConfig() :>> ', bountyfs.getConfig());
-  // dataGetter.iterator()
+  await setup()
+  const workedHours = await getWorkHours()
+  const referenceDate = await getReferenceDate()
+  const referenceBalance = await getReferenceBalance()
+  const balance = dateUtils.calcFlexBalance(
+    workedHours,
+    referenceDate,
+    referenceBalance
+  )
+  console.log('referenceDate :>> ', referenceDate.toLocaleDateString("no-NB"));
+  console.log('referenceBalance :>> ', referenceBalance);
+  console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"));
+  console.log('balance :>> ', balance);
 }
 
-import { fileURLToPath } from "url";
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  run()
-}
+run()
+// import { fileURLToPath } from "url";
+// console.log('process.argv :>> ', process.argv);
+// console.log('fileURLToPath(import.meta.url) :>> ', fileURLToPath(import.meta.url));
+// if (process.argv[1] === fileURLToPath(import.meta.url)) {
+//   run()
+// }
