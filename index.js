@@ -22,7 +22,7 @@ async function run() {
   console.log('referenceDate :>> ', referenceDate.toLocaleDateString("no-NB"));
   console.log('referenceBalance :>> ', referenceBalance);
   console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"));
-  console.log('balance :>> ', balance);
+  console.log('currBalance :>> ', balance);
 }
 
 run()

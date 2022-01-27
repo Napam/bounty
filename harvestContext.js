@@ -102,8 +102,6 @@ const taskLeavePaid = {
   }
 }
 
-const EXCLUSION_IDS = new Set([taskLeavePaid.id])
-
 export async function getWorkHours() {
   const config = getConfig()
   const data = getData()
@@ -116,10 +114,7 @@ export async function getWorkHours() {
 
   let hours = 0
   for await (let timeEntry of timeEntryGenerator(config.headers, data.lastUpdatedDate))
-    if (EXCLUSION_IDS.has(timeEntry.task.id))
-      continue
-    else
-      hours += timeEntry.hours
+    hours += Math.sign((timeEntry.task.id !== taskLeavePaid.task.id) - 0.5) * timeEntry.hours
 
   return hours
 }
