@@ -2,6 +2,7 @@ import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
+import dateUtils from './dateUtils.js'
 
 const BOUNTY_DIR = path.join(os.homedir(), '.bounty')
 const BOUNTY_CONFIG = path.join(BOUNTY_DIR, 'config.json')
@@ -88,6 +89,11 @@ export function clean(path = BOUNTY_DIR) {
   fs.rmSync(path, { recursive: true, force: true })
 }
 
+/**
+ * 
+ * @param {object} headers headers to send to harvest
+ * @param {string} from string of YYYY-MM-DD
+ */
 export async function* timeEntryGenerator(headers, from) {
   const get = async (url, params) => (await axios.get(url, { headers, params })).data
   let res = await get('https://api.harvestapp.com/v2/time_entries', { from })
@@ -112,8 +118,9 @@ export async function getWorkHours() {
   if (data.lastUpdatedBalance === null)
     data.lastUpdatedBalance = config.referenceBalance
 
+  const from = dateUtils.offsetISODate(data.lastUpdatedDate, { days: 1 })
   let hours = 0
-  for await (let timeEntry of timeEntryGenerator(config.headers, data.lastUpdatedDate))
+  for await (let timeEntry of timeEntryGenerator(config.headers, from))
     hours += Math.sign((timeEntry.task.id !== taskLeavePaid.task.id) - 0.5) * timeEntry.hours
 
   return hours

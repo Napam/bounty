@@ -95,6 +95,18 @@ function offsetDate(
 }
 
 /**
+ * @param {string} isodate, date formatted as YYYY-MM-DD
+ * @param offsets 
+ * @returns string with format YYYY-MM-DD
+ */
+function offsetISODate(
+  isodate,
+  { years = 0, months = 0, days = 0 } = {}
+) {
+  return offsetDate(new Date(isodate.split('T')[0]), { years, months, days }).toISOString().split('T')[0]
+}
+
+/**
  * Returns easter days respective to given year
  * @param {number} year must be greater or equal to 1970
  * @returns
@@ -140,14 +152,14 @@ function inWeekend(date) {
 
 
 /**
- * Assert that from is before to, else throw error
+ * Assert that 'from' is before or equal 'to', else throw error
  * @param {Date} from
  * @param {Date} to
  * @param alternativeNames in case you want to change the 'from' and 'to' names in the error message
  * @returns
  */
 function validateFromToDates(from, to, { fromAlias = 'from', toAlias = 'to' } = {}) {
-  if (from.getTime() > to.getTime())
+  if (from.getTime() >= to.getTime())
     throw new Error(`"${fromAlias}" date cannot be later than "${toAlias}" date`)
 }
 
@@ -164,11 +176,10 @@ function isBetween(date, from, to) {
 }
 
 /**
- * Calculate number of days and number of saturdays and sundays between 'from' and 'to' dates.
- * Returned days are total days, so you must subtract saturdaysAndSundays to get work days
+ * Calculate number of days between and including 'from' and 'to' dates.
  * @param {Date} from
  * @param {Date} to
- * @returns
+ * @returns total number of days, and the count of each distinct days
  */
 function countDays(from, to) {
   validateFromToDates(from, to)
@@ -301,6 +312,7 @@ function calcFlexBalance(
     workHoursPerDay = 7.5
   } = {}
 ) {
+  referenceDate = offsetDate(referenceDate, { days: 1 })
   validateFromToDates(referenceDate, to, { fromAlias: 'referenceDate' })
   const { days: dayCount, ...weekdaysCounts } = countDays(referenceDate, to)
   const holidaysInWorkdays = countHolidaysInWorkdays(holidays, workdays)
@@ -327,6 +339,7 @@ export default {
   norwegianHolidaysGenerator,
   NUM_TO_DAY,
   offsetDate,
+  offsetISODate,
   SATURDAY,
   slowCountDays,
   SUNDAY,
