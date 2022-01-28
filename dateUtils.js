@@ -152,14 +152,14 @@ function inWeekend(date) {
 
 
 /**
- * Assert that 'from' is before or equal 'to', else throw error
+ * Assert that 'from' is before 'to', else throw error
  * @param {Date} from
  * @param {Date} to
  * @param alternativeNames in case you want to change the 'from' and 'to' names in the error message
  * @returns
  */
 function validateFromToDates(from, to, { fromAlias = 'from', toAlias = 'to' } = {}) {
-  if (from.getTime() >= to.getTime())
+  if (from.getTime() > to.getTime())
     throw new Error(`"${fromAlias}" date cannot be later than "${toAlias}" date`)
 }
 
