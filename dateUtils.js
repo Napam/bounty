@@ -283,10 +283,35 @@ function countHolidaysInWorkdays(holidays, workdays) {
  * Get today's date object with zeroed out hours, minutes, seconds and milliseconds
  * @returns
  */
-function getToday() {
+function getTodayDate() {
   const date = new Date()
   date.setHours(0, 0, 0, 0)
   return date
+}
+
+/**
+ * Get today's date iso string (YYYY-MM-DD)
+ * @returns
+ */
+function getTodayISO() {
+  const date = new Date()
+  date.setHours(0, -date.getTimezoneOffset(), 0, 0)
+  return date.toISOString().split('T')[0]
+}
+
+/**
+ * Get today in milliseconds
+ */
+function getTodayMs() {
+
+}
+
+/**
+ * @param {string} isodate MMMM-YY-DD
+ * @returns
+ */
+function ISOToMs(isodate) {
+  return new Date(isodate.split('T')[0].split('-')).getTime()
 }
 
 /**
@@ -306,13 +331,12 @@ function calcFlexBalance(
   referenceDate,
   referenceBalance,
   {
-    to = getToday(),
+    to = getTodayDate(),
     workdays = DEFAULT_WORKDAYS,
     holidays = norwegianHolidaysGenerator(referenceDate, to),
     workHoursPerDay = 7.5
   } = {}
 ) {
-  referenceDate = offsetDate(referenceDate, { days: 1 })
   validateFromToDates(referenceDate, to, { fromAlias: 'referenceDate' })
   const { days: dayCount, ...weekdaysCounts } = countDays(referenceDate, to)
   const holidaysInWorkdays = countHolidaysInWorkdays(holidays, workdays)
@@ -332,9 +356,11 @@ export default {
   FRIDAY,
   getComplementWeekdays,
   getNorwegianHolidays,
-  getToday,
+  getTodayDate,
+  getTodayISO,
   inWeekend,
   isBetween,
+  ISOToMs,
   MONDAY,
   norwegianHolidaysGenerator,
   NUM_TO_DAY,

@@ -9,6 +9,10 @@ import {
   getReferenceBalance,
 } from './harvestContext.js'
 
+function incrementDateIfLess(date) {
+  return dateUtils.offsetDate(date, { days: date.getTime() < dateUtils.getTodayDate().getTime() })
+}
+
 async function run() {
   await setup()
   const workedHours = await getWorkHours()
@@ -16,7 +20,7 @@ async function run() {
   const referenceBalance = await getReferenceBalance()
   const balance = dateUtils.calcFlexBalance(
     workedHours,
-    referenceDate,
+    incrementDateIfLess(referenceDate),
     referenceBalance
   )
   console.log('referenceDate :>> ', referenceDate.toLocaleDateString("no-NB"));
@@ -26,9 +30,3 @@ async function run() {
 }
 
 run()
-// import { fileURLToPath } from "url";
-// console.log('process.argv :>> ', process.argv);
-// console.log('fileURLToPath(import.meta.url) :>> ', fileURLToPath(import.meta.url));
-// if (process.argv[1] === fileURLToPath(import.meta.url)) {
-//   run()
-// }

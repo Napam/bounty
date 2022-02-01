@@ -2,6 +2,7 @@ import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
+import readline from 'readline'
 import dateUtils from './dateUtils.js'
 
 const BOUNTY_DIR = path.join(os.homedir(), '.bounty')
@@ -28,7 +29,6 @@ const CACHE_CONFIG_KEY = 'config'
 const cache = {}
 
 export async function setupFilesInHome(configSchema, dataSchema, dir = BOUNTY_DIR, config = BOUNTY_CONFIG) {
-
   await fs.mkdir(BOUNTY_DIR, { recursive: true }, error => {
     if (error) throw new Error(`Error when attempting to create directory in ${dir}: ${error}`)
   })
@@ -40,8 +40,42 @@ export async function setupFilesInHome(configSchema, dataSchema, dir = BOUNTY_DI
     fs.writeFileSync(BOUNTY_DATA, JSON.stringify(dataSchema, null, 4))
 }
 
+/**
+ * Assumes config exists
+ * @returns 
+ */
+export async function prompt(configDir = BOUNTY_CONFIG) {
+  const config = getConfig(configDir)
+  if (config.headers['Harvest-Account-ID'] !== null && config.headers['Authorization'] !== null)
+    return
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  const question = string => new Promise(resolve => rl.question(string, resolve))
+
+  console.log('Go to https://id.getharvest.com/developers')
+  console.log('Press "Create new personal access token" if dont have one')
+  const token = await question("Copy and paste your token here: ")
+  const accountid = await question("Copy and paste Account ID here: ")
+  const referenceDate = await question("Enter reference date (YYYY-MM-DD): ")
+  const referenceBalance = await question("Enter reference flextime balance (float): ")
+  rl.close()
+
+  console.log('Got token: ', token);
+  console.log('Got Account Id: ', accountid);
+  config.headers['Authorization'] = 'Bearer ' + token
+  config.headers['Harvest-Account-ID'] = accountid
+  config.referenceDate = referenceDate
+  config.referenceBalance = parseFloat(referenceBalance)
+  setConfig(config)
+  console.log(`Config successfully saved at ${configDir}`)
+}
+
 export async function setup(configSchema = CONFIG_SCHEMA, dataSchema = DATA_SCHEMA) {
-  setupFilesInHome(configSchema, dataSchema)
+  await setupFilesInHome(configSchema, dataSchema)
+  await prompt()
 }
 
 export function getConfig(dir = BOUNTY_CONFIG) {
@@ -118,7 +152,11 @@ export async function getWorkHours() {
   if (data.lastUpdatedBalance === null)
     data.lastUpdatedBalance = config.referenceBalance
 
-  const from = dateUtils.offsetISODate(data.lastUpdatedDate, { days: 1 })
+  let from = dateUtils.offsetISODate(
+    data.lastUpdatedDate,
+    { days: dateUtils.ISOToMs(data.lastUpdatedDate) < dateUtils.getTodayDate().getTime() }
+  )
+
   let hours = 0
   for await (let timeEntry of timeEntryGenerator(config.headers, from))
     hours += Math.sign((timeEntry.task.id !== taskLeavePaid.task.id) - 0.5) * timeEntry.hours
