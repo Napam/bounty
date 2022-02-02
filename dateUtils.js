@@ -300,13 +300,6 @@ function getTodayISO() {
 }
 
 /**
- * Get today in milliseconds
- */
-function getTodayMs() {
-
-}
-
-/**
  * @param {string} isodate MMMM-YY-DD
  * @returns
  */
