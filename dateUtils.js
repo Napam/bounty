@@ -138,6 +138,7 @@ function getNorwegianHolidays(year) {
     christmasEve: new Date(year, 11, 24), // Not necessarily for all workplaces
     christmasDay: new Date(year, 11, 25), // Forste juledag
     boxingDay: new Date(year, 11, 26), // Andre jule dag
+    newYearsEve: new Date(year, 11, 31), // Not necessarily for all workplaces
   }
   return { ...easterDates, ...fixedHolidays }
 }
@@ -271,11 +272,10 @@ function getComplementWeekdays(days) {
  * @returns
  */
 function countHolidaysInWorkdays(holidays, workdays) {
-  const workdaySet = new Set(workdays)
+  const workdaySet = new Set(workdays.map(day => DAY_TO_NUM[day]))
   let holidaysInWorkdays = 0
   for (let holiday of holidays)
-    if (workdaySet.has(holiday.getDay()))
-      holidaysInWorkdays++
+    holidaysInWorkdays += workdaySet.has(holiday.getDay())
   return holidaysInWorkdays
 }
 
@@ -344,6 +344,7 @@ export default {
   calcEasterSunday,
   calcFlexBalance,
   countDays,
+  countHolidaysInWorkdays,
   DAY_TO_NUM,
   DEFAULT_WORKDAYS,
   FRIDAY,
@@ -364,8 +365,8 @@ export default {
   SUNDAY,
   THURSDAY,
   TUESDAY,
-  WEDNESDAY,
-  UNIQUE_DAYS
+  UNIQUE_DAYS,
+  WEDNESDAY
 }
 
 import { fileURLToPath } from "url";

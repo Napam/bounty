@@ -17,7 +17,6 @@ test('offsetISODate', () => {
 
 test('ISOToMS', () => {
   const date = new Date(2022, 2, 22)
-  console.log('date :>> ', date);
   expect(dateUtils.ISOToMs('2022-03-22')).toEqual(date.getTime())
 })
 
@@ -143,6 +142,20 @@ test('calcEasterDates is correct for year 2022', () => {
     whitsun: new Date(2022, 5, 5),
     whitMonday: new Date(2022, 5, 6)
   })
+})
+
+test('countHolidaysInWorkDays works for April 2022 with norwegianHolidaysGenerator', () => {
+  const workdays = [
+    dateUtils.MONDAY,
+    dateUtils.TUESDAY,
+    dateUtils.WEDNESDAY,
+    dateUtils.THURSDAY,
+    dateUtils.FRIDAY
+  ]
+  const from = new Date(2022, 3, 1)
+  const to = new Date(2022, 3, 30)
+  const count = dateUtils.countHolidaysInWorkdays(dateUtils.norwegianHolidaysGenerator(from, to), workdays)
+  expect(count).toEqual(3)
 })
 
 test('getComplementWeekdays works', () => {
