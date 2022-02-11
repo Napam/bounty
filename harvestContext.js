@@ -38,7 +38,7 @@ export async function setupFilesInHome(configSchema, dataSchema, dir = BOUNTY_DI
 /**
  * Assumes config exists
  */
-export async function prompt(configDir = BOUNTY_CONFIG) {
+export async function prompt() {
   const config = getConfig()
   if (config.headers['Harvest-Account-ID'] !== null && config.headers['Authorization'] !== null)
     return
@@ -61,8 +61,8 @@ export async function prompt(configDir = BOUNTY_CONFIG) {
   config.referenceDate = referenceDate
   config.referenceBalance = parseFloat(referenceBalance)
   setConfig(config)
-  console.log(`Config successfully saved at ${configDir}`)
-  console.log(`If something crashes, make sure that the config values makes sense`)
+  console.log('Config successfully saved')
+  console.log(`If something crashes, make sure that the config values makes sense in ${BOUNTY_CONFIG}`)
 }
 
 export async function setup(configSchema = CONFIG_SCHEMA, dataSchema = DATA_SCHEMA) {
@@ -70,11 +70,16 @@ export async function setup(configSchema = CONFIG_SCHEMA, dataSchema = DATA_SCHE
   await prompt()
 }
 
-export async function finish({ to, balance }) {
+export async function finish({ from, to, balance }) {
   const data = { ...DATA_SCHEMA }
   data.lastUpdatedDate = dateUtils.dateToISO(to)
   data.lastUpdatedBalance = balance
-  setData(data)
+  // setData(data)
+
+  const config = getConfig()
+  console.log("Reference date in config:\x1b[33m", config.referenceDate, "\x1b[0m")
+  console.log("Reference balance in config:", config.referenceBalance)
+  console.log("Current flextime balance:", balance)
 }
 
 export function getConfig() {
