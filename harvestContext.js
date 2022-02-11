@@ -23,11 +23,6 @@ const DATA_SCHEMA = {
   lastUpdatedBalance: null
 }
 
-const CACHE_DATA_KEY = 'data'
-const CACHE_CONFIG_KEY = 'config'
-
-const cache = {}
-
 export async function setupFilesInHome(configSchema, dataSchema, dir = BOUNTY_DIR, config = BOUNTY_CONFIG) {
   await fs.mkdir(BOUNTY_DIR, { recursive: true }, error => {
     if (error) throw new Error(`Error when attempting to create directory in ${dir}: ${error}`)
@@ -42,21 +37,17 @@ export async function setupFilesInHome(configSchema, dataSchema, dir = BOUNTY_DI
 
 /**
  * Assumes config exists
- * @returns 
  */
 export async function prompt(configDir = BOUNTY_CONFIG) {
-  const config = getConfig(configDir)
+  const config = getConfig()
   if (config.headers['Harvest-Account-ID'] !== null && config.headers['Authorization'] !== null)
     return
 
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  })
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
   const question = string => new Promise(resolve => rl.question(string, resolve))
 
   console.log('Go to https://id.getharvest.com/developers')
-  console.log('Press "Create new personal access token" if dont have one')
+  console.log('Press "Create new personal access token" if you dont have one')
   const token = await question("Copy and paste your token here: ")
   const accountid = await question("Copy and paste Account ID here: ")
   const referenceDate = await question("Enter reference date (YYYY-MM-DD): ")
@@ -71,6 +62,7 @@ export async function prompt(configDir = BOUNTY_CONFIG) {
   config.referenceBalance = parseFloat(referenceBalance)
   setConfig(config)
   console.log(`Config successfully saved at ${configDir}`)
+  console.log(`If something crashes, make sure that the config values makes sense`)
 }
 
 export async function setup(configSchema = CONFIG_SCHEMA, dataSchema = DATA_SCHEMA) {
@@ -78,12 +70,16 @@ export async function setup(configSchema = CONFIG_SCHEMA, dataSchema = DATA_SCHE
   await prompt()
 }
 
-export function getConfig(dir = BOUNTY_CONFIG) {
-  return JSON.parse(fs.readFileSync(dir).toString())
+export async function finish({ balance }) {
+
 }
 
-export function getData(dir = BOUNTY_DATA) {
-  return JSON.parse(fs.readFileSync(dir).toString())
+export function getConfig() {
+  return JSON.parse(fs.readFileSync(BOUNTY_CONFIG).toString())
+}
+
+export function getData() {
+  return JSON.parse(fs.readFileSync(BOUNTY_DATA).toString())
 }
 
 export function setConfig(config, path = BOUNTY_CONFIG) {
@@ -129,10 +125,17 @@ export function clean(path = BOUNTY_DIR) {
  * @param {string} from string of YYYY-MM-DD
  */
 export async function* timeEntryGenerator(headers, from) {
-  const get = async (url, params) => (await axios.get(url, { headers, params })).data
-  let res = await get('https://api.harvestapp.com/v2/time_entries', { from })
-  do for (let timeEntry of res.time_entries) yield timeEntry
-  while (res.links.next && (res = await get(res.links.next)))
+  try {
+    const get = async (url, params) => (await axios.get(url, { headers, params })).data
+    let res = await get('https://api.harvestapp.com/v2/time_entries', { from })
+    do for (let timeEntry of res.time_entries) yield timeEntry
+    while (res.links.next && (res = await get(res.links.next)))
+  } catch (error) {
+    console.log(`\x1b[31mAn error occured when attempting to get data from Harvest\x1b[0m`)
+    console.log('Attempt to display axios error:', error?.response?.data)
+    console.log(`Are the values in \x1b[33m${BOUNTY_CONFIG}\x1b[0m correct?`)
+    process.exit()
+  }
 }
 
 const timeOffEntry = {
@@ -149,12 +152,8 @@ const negativeIDs = new Set([
 export async function getWorkHours() {
   const config = getConfig()
   const data = getData()
-
-  if (data.lastUpdatedDate === null)
-    data.lastUpdatedDate = config.referenceDate
-
-  if (data.lastUpdatedBalance === null)
-    data.lastUpdatedBalance = config.referenceBalance
+  data.lastUpdatedDate ??= config.referenceDate
+  data.lastUpdatedBalance ??= config.referenceBalance
 
   let from = dateUtils.offsetISODate(
     data.lastUpdatedDate,

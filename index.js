@@ -4,6 +4,7 @@ import dateUtils from './dateUtils.js'
 
 import {
   setup,
+  finish,
   getWorkHours,
   getReferenceDate,
   getReferenceBalance,
@@ -23,6 +24,7 @@ async function run() {
     incrementDateIfBeforeToday(referenceDate),
     referenceBalance
   )
+  await finish({ workedHours, referenceDate, referenceBalance, balance })
   console.log('referenceDate :>> ', referenceDate.toLocaleDateString("no-NB"));
   console.log('referenceBalance :>> ', referenceBalance);
   console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"));
