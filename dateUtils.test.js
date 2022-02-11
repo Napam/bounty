@@ -168,7 +168,7 @@ test('getComplementWeekdays works', () => {
   ])
 })
 
-test('calcFlexBalance test case 1 ', () => {
+test('calcFlexBalance test case January 2022 ', () => {
   const referenceDate = new Date(2022, 0, 1)
   const referenceBalance = 12.5
   const to = new Date(2022, 0, 31)
@@ -178,4 +178,16 @@ test('calcFlexBalance test case 1 ', () => {
   const balance = dateUtils.calcFlexBalance(actualHours, referenceDate, referenceBalance, { to })
   expect(balance).toEqual(actualHours - expectedWorkDays * expectedHoursPerDay + referenceBalance)
   expect(balance).toEqual(15)
+})
+
+test('calcFlexBalance test case April 2022 (3 holidays)', () => {
+  const referenceDate = new Date(2022, 3, 1)
+  const referenceBalance = 10
+  const to = new Date(2022, 3, 30)
+  const expectedWorkDays = 18
+  const expectedHoursPerDay = 7.5
+  const actualHours = 135
+  const balance = dateUtils.calcFlexBalance(actualHours, referenceDate, referenceBalance, { to })
+  expect(balance).toEqual(actualHours - expectedWorkDays * expectedHoursPerDay + referenceBalance)
+  expect(balance).toEqual(10)
 })
