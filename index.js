@@ -9,7 +9,7 @@ import {
   getReferenceBalance,
 } from './harvestContext.js'
 
-function incrementDateIfLess(date) {
+function incrementDateIfBeforeToday(date) {
   return dateUtils.offsetDate(date, { days: date.getTime() < dateUtils.getTodayDate().getTime() })
 }
 
@@ -20,7 +20,7 @@ async function run() {
   const referenceBalance = await getReferenceBalance()
   const balance = dateUtils.calcFlexBalance(
     workedHours,
-    incrementDateIfLess(referenceDate),
+    incrementDateIfBeforeToday(referenceDate),
     referenceBalance
   )
   console.log('referenceDate :>> ', referenceDate.toLocaleDateString("no-NB"));

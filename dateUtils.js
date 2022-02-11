@@ -57,9 +57,8 @@ const DEFAULT_WORKDAYS = [
  * @returns date of easter sunday at given year
  */
 function calcEasterSunday(year) {
-  if (typeof year !== 'number') {
+  if (typeof year !== 'number')
     throw new Error('Year must specified as a number')
-  }
 
   const y = year
   const g = y % 19
