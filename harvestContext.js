@@ -135,12 +135,16 @@ export async function* timeEntryGenerator(headers, from) {
   while (res.links.next && (res = await get(res.links.next)))
 }
 
-const taskLeavePaid = {
+const timeOffEntry = {
   task: {
-    id: 17810723,
-    name: 'Leave - Paid'
+    id: 18097850,
+    name: 'Time off'
   }
 }
+
+const negativeIDs = new Set([
+  timeOffEntry.task.id
+])
 
 export async function getWorkHours() {
   const config = getConfig()
@@ -159,7 +163,7 @@ export async function getWorkHours() {
 
   let hours = 0
   for await (let timeEntry of timeEntryGenerator(config.headers, from))
-    hours += Math.sign((timeEntry.task.id !== taskLeavePaid.task.id) - 0.5) * timeEntry.hours
+    hours += (1 - (negativeIDs.has(timeEntry.task.id) << 1)) * timeEntry.hours
 
   return hours
 }
