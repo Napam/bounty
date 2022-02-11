@@ -19,12 +19,14 @@ async function run() {
   const workedHours = await getWorkHours()
   const referenceDate = await getReferenceDate()
   const referenceBalance = await getReferenceBalance()
+  const to = dateUtils.getTodayDate()
   const balance = dateUtils.calcFlexBalance(
     workedHours,
     incrementDateIfBeforeToday(referenceDate),
-    referenceBalance
+    referenceBalance,
+    { to }
   )
-  await finish({ workedHours, referenceDate, referenceBalance, balance })
+  await finish({ to, balance })
   console.log('referenceDate :>> ', referenceDate.toLocaleDateString("no-NB"));
   console.log('referenceBalance :>> ', referenceBalance);
   console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"));

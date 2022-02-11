@@ -289,13 +289,22 @@ function getTodayDate() {
 }
 
 /**
+ * Turns date to YYYY-MM-DD. Will handle time zone offsets
+ * @param {Date} date 
+ * @returns 
+ */
+function dateToISO(date) {
+  date = new Date(date.getTime())
+  date.setHours(0, -date.getTimezoneOffset(), 0, 0)
+  return date.toISOString().split('T')[0]
+}
+
+/**
  * Get today's date iso string (YYYY-MM-DD)
  * @returns
  */
 function getTodayISO() {
-  const date = new Date()
-  date.setHours(0, -date.getTimezoneOffset(), 0, 0)
-  return date.toISOString().split('T')[0]
+  return dateToISO(new Date())
 }
 
 /**
@@ -344,6 +353,7 @@ export default {
   calcFlexBalance,
   countDays,
   countHolidaysInWorkdays,
+  dateToISO,
   DAY_TO_NUM,
   DEFAULT_WORKDAYS,
   FRIDAY,

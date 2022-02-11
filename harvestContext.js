@@ -70,8 +70,11 @@ export async function setup(configSchema = CONFIG_SCHEMA, dataSchema = DATA_SCHE
   await prompt()
 }
 
-export async function finish({ balance }) {
-
+export async function finish({ to, balance }) {
+  const data = { ...DATA_SCHEMA }
+  data.lastUpdatedDate = dateUtils.dateToISO(to)
+  data.lastUpdatedBalance = balance
+  setData(data)
 }
 
 export function getConfig() {
@@ -162,7 +165,7 @@ export async function getWorkHours() {
 
   let hours = 0
   for await (let timeEntry of timeEntryGenerator(config.headers, from))
-    hours += (1 - (negativeIDs.has(timeEntry.task.id) << 1)) * timeEntry.hours
+    hours += (1 - 2 * negativeIDs.has(timeEntry.task.id)) * timeEntry.hours
 
   return hours
 }

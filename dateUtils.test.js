@@ -16,6 +16,11 @@ test('ISOToMS', () => {
   expect(dateUtils.ISOToMs('2022-03-22')).toEqual(date.getTime())
 })
 
+test('dateToISO', () => {
+  const date = new Date(2022, 1, 2)
+  expect(dateUtils.dateToISO(date)).toEqual('2022-02-02')
+})
+
 const daysIn = {
   january2022: {
     days: 31,
