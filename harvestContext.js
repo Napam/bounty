@@ -145,7 +145,7 @@ const timeOffEntry = {
   }
 }
 
-const negativeIDs = new Set([
+const ignoreIDs = new Set([
   timeOffEntry.task.id
 ])
 
@@ -162,7 +162,7 @@ export async function getWorkHours() {
 
   let hours = 0
   for await (let timeEntry of timeEntryGenerator(config.headers, from))
-    hours += (1 - (negativeIDs.has(timeEntry.task.id) << 1)) * timeEntry.hours
+    hours += !ignoreIDs.has(timeEntry.task.id) * timeEntry.hours
 
   return hours
 }
