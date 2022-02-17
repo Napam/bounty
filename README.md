@@ -1,10 +1,10 @@
 # Install
-1. yarn
-2. npm link
-3. bounty
+1. `yarn` &rarr; *install required modules*
+2. `npm link` &rarr; *makes bounty available everywhere*
+3. `bounty` &rarr; *run bounty*
 
 # Info
-In the first `bounty` call it will ask for user info. The info is then stored in `~/.bounty/config.json`, which you can alter manually in case you want to change something, or maybe the prompt failed. The config is for example
+The first `bounty` call will prompt for user info. The info is then stored in `~/.bounty/config.json`, which you can alter manually in case you want to change something, or maybe the prompt failed. The config is for example
 ```json
 {
     "headers": {

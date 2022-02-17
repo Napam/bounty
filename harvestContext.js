@@ -7,7 +7,6 @@ import dateUtils from './dateUtils.js'
 
 const BOUNTY_DIR = path.join(os.homedir(), '.bounty')
 const BOUNTY_CONFIG = path.join(BOUNTY_DIR, 'config.json')
-const BOUNTY_DATA = path.join(BOUNTY_DIR, 'data.json')
 
 const CONFIG_SCHEMA = {
   headers: {
@@ -18,21 +17,13 @@ const CONFIG_SCHEMA = {
   referenceBalance: null,
 }
 
-const DATA_SCHEMA = {
-  lastUpdatedDate: null,
-  lastUpdatedBalance: null
-}
-
-export async function setupFilesInHome(configSchema, dataSchema, dir = BOUNTY_DIR, config = BOUNTY_CONFIG) {
+export async function setupFilesInHome(configSchema) {
   await fs.mkdir(BOUNTY_DIR, { recursive: true }, error => {
-    if (error) throw new Error(`Error when attempting to create directory in ${dir}: ${error}`)
+    if (error) throw new Error(`Error when attempting to create directory in ${BOUNTY_DIR}: ${error}`)
   })
 
   if (!fs.existsSync(BOUNTY_CONFIG))
-    fs.writeFileSync(BOUNTY_CONFIG, JSON.stringify(configSchema, null, 4))
-
-  if (!fs.existsSync(BOUNTY_DATA))
-    fs.writeFileSync(BOUNTY_DATA, JSON.stringify(dataSchema, null, 4))
+    fs.writeFileSync(configSchema, JSON.stringify(configSchema, null, 4))
 }
 
 /**
@@ -65,12 +56,12 @@ export async function prompt(configDir = BOUNTY_CONFIG) {
   console.log(`If something crashes, make sure that the config values makes sense`)
 }
 
-export async function setup(configSchema = CONFIG_SCHEMA, dataSchema = DATA_SCHEMA) {
-  await setupFilesInHome(configSchema, dataSchema)
+export async function setup(configSchema = CONFIG_SCHEMA) {
+  await setupFilesInHome(configSchema)
   await prompt()
 }
 
-export async function finish({ balance }) {
+export async function finish({ from, to, balance }) {
 
 }
 
@@ -78,23 +69,12 @@ export function getConfig() {
   return JSON.parse(fs.readFileSync(BOUNTY_CONFIG).toString())
 }
 
-export function getData() {
-  return JSON.parse(fs.readFileSync(BOUNTY_DATA).toString())
-}
-
-export function setConfig(config, path = BOUNTY_CONFIG) {
-  fs.writeFileSync(path, JSON.stringify(config, null, 4))
-}
-
-export function setData(config, path = BOUNTY_DATA) {
-  fs.writeFileSync(path, JSON.stringify(config, null, 4))
+export function setConfig(config) {
+  fs.writeFileSync(BOUNTY_CONFIG, JSON.stringify(config, null, 4))
 }
 
 export async function getReferenceDate() {
-  const data = getData()
   const isodateToDate = isodate => new Date(isodate.split('-'))
-  if (data.lastUpdatedDate)
-    return isodateToDate(data.lastUpdatedDate)
 
   const config = getConfig()
   if (config.referenceDate)
@@ -104,10 +84,6 @@ export async function getReferenceDate() {
 }
 
 export async function getReferenceBalance() {
-  const data = getData()
-  if (data.lastUpdatedBalance)
-    return data.lastUpdatedBalance
-
   const config = getConfig()
   if (config.referenceBalance)
     return config.referenceBalance
@@ -145,24 +121,20 @@ const timeOffEntry = {
   }
 }
 
-const ignoreIDs = new Set([
+const IGNORE_IDS = new Set([
   timeOffEntry.task.id
 ])
 
 export async function getWorkHours() {
   const config = getConfig()
-  const data = getData()
-  data.lastUpdatedDate ??= config.referenceDate
-  data.lastUpdatedBalance ??= config.referenceBalance
-
   let from = dateUtils.offsetISODate(
-    data.lastUpdatedDate,
-    { days: dateUtils.ISOToMs(data.lastUpdatedDate) < dateUtils.getTodayDate().getTime() }
+    config.referenceDate,
+    { days: dateUtils.ISOToMs(config.referenceDate) < dateUtils.getTodayDate().getTime() }
   )
 
   let hours = 0
   for await (let timeEntry of timeEntryGenerator(config.headers, from))
-    hours += !ignoreIDs.has(timeEntry.task.id) * timeEntry.hours
+    hours += !IGNORE_IDS.has(timeEntry.task.id) * timeEntry.hours
 
   return hours
 }
