@@ -1,6 +1,6 @@
 # Install
 1. `yarn` &rarr; *install required modules*
-2. `npm link` &rarr; *makes bounty available everywhere*
+2. `yarn link` &rarr; *makes bounty available everywhere*
 3. `bounty` &rarr; *run bounty*
 
 # Info
