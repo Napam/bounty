@@ -23,7 +23,7 @@ export async function setupFilesInHome(configSchema) {
   })
 
   if (!fs.existsSync(BOUNTY_CONFIG))
-    fs.writeFileSync(configSchema, JSON.stringify(configSchema, null, 4))
+    fs.writeFileSync(BOUNTY_CONFIG, JSON.stringify(configSchema, null, 4))
 }
 
 /**
