@@ -1,3 +1,7 @@
+# Requirements
+- Node v15 or higher
+- yarn
+
 # Install
 1. `yarn` &rarr; *install required modules*
 2. `yarn link` &rarr; *makes bounty available everywhere*
