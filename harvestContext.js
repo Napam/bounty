@@ -85,7 +85,7 @@ export async function getReferenceDate() {
 
 export async function getReferenceBalance() {
   const config = getConfig()
-  if (config.referenceBalance)
+  if (config.referenceBalance != null)
     return config.referenceBalance
 
   throw new Error("Improper configuration of config")
