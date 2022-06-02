@@ -122,7 +122,8 @@ const timeOffEntry = {
 }
 
 const IGNORE_IDS = new Set([
-  timeOffEntry.task.id
+  timeOffEntry.task.id,
+  18076986
 ])
 
 export async function getWorkHours() {
