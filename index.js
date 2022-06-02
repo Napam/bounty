@@ -3,35 +3,26 @@
 import dateUtils from './dateUtils.js'
 
 import {
-  setup,
-  finish,
+  beforeRun,
   getWorkHours,
   getReferenceDate,
   getReferenceBalance,
-} from './harvestContext.js'
+  afterRun,
+} from './integrations/harvest/index.js'
 
 function incrementDateIfBeforeToday(date) {
   return dateUtils.offsetDate(date, { days: date.getTime() < dateUtils.getTodayDate().getTime() })
 }
 
 async function run() {
-  await setup()
+  await beforeRun()
   const workedHours = await getWorkHours()
   const referenceDate = await getReferenceDate()
   const referenceBalance = await getReferenceBalance()
   const from = incrementDateIfBeforeToday(referenceDate)
   const to = dateUtils.getTodayDate()
-  const balance = dateUtils.calcFlexBalance(
-    workedHours,
-    from,
-    referenceBalance,
-    { to }
-  )
-  await finish({ from, to, balance })
-  console.log('referenceDate :>> ', referenceDate.toLocaleDateString("no-NB"));
-  console.log('referenceBalance :>> ', referenceBalance);
-  console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"));
-  console.log('currBalance :>> ', balance);
+  const balance = dateUtils.calcFlexBalance(workedHours, from, referenceBalance, { to })
+  await afterRun({ from, to, balance })
 }
 
 run()
