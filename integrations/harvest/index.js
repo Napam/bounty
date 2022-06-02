@@ -1,11 +1,5 @@
 
 import dateUtils from '../../dateUtils.js'
-
-import {
-  CONFIG_SCHEMA,
-  IGNORE_IDS
-} from './constants.js'
-
 import {
   setupFilesInHome,
   promptForInfo,
@@ -13,8 +7,8 @@ import {
   timeEntryGenerator
 } from './utils.js'
 
-export async function beforeRun(configSchema = CONFIG_SCHEMA) {
-  await setupFilesInHome(configSchema)
+export async function beforeRun() {
+  await setupFilesInHome()
   await promptForInfo()
 }
 
@@ -43,18 +37,45 @@ export async function getWorkHours() {
     { days: dateUtils.ISOToMs(config.referenceDate) < dateUtils.getTodayDate().getTime() }
   )
 
+  // Example of project and client objects from Harvest
+  // "project": {
+  //   "id": 12345678,
+  //   "name": "Absence",
+  //   "code": "Absence"
+  // }
+  // "task": {
+  //     "id": 12345678,
+  //     "name": "Leave - Paid"
+  // }
+
+  const zeroIfShouldIgnore = timeEntry => {
+    for (const { project: projectName, task: taskName } of config.entriesToIgnore) {
+      if (
+        timeEntry.project.name === projectName &&
+        timeEntry.task.name === taskName
+      ) {
+        return 0
+      }
+    }
+    return 1
+  }
+
   let hours = 0
   for await (let timeEntry of timeEntryGenerator(config.headers, from))
-    hours += !IGNORE_IDS.has(timeEntry.task.id) * timeEntry.hours
-
+    hours += zeroIfShouldIgnore(timeEntry) * timeEntry.hours
   return hours
 }
 
+export function getExpectedWorkHoursPerDay() {
+  const config = getConfig()
+  return config.expectedWorkHoursPerDay
+}
+
 export async function afterRun({ from, to, balance }) {
-  console.log('referenceDate :>> ', getReferenceDate().toLocaleDateString("no-NB"));
-  console.log('referenceBalance :>> ', getReferenceBalance());
-  console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"));
-  console.log('currBalance :>> ', balance);
+  console.log('referenceDate :>> ', getReferenceDate().toLocaleDateString("no-NB"))
+  console.log('referenceBalance :>> ', getReferenceBalance())
+  console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"))
+  console.log('currBalance :>> ', balance)
 }
 
 import { fileURLToPath } from "url";
