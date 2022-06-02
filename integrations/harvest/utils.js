@@ -3,8 +3,7 @@ import axios from 'axios'
 import readline from 'readline'
 import {
   BOUNTY_DIR,
-  BOUNTY_CONFIG,
-  IGNORE_IDS
+  BOUNTY_CONFIG
 } from './constants.js'
 
 export async function setupFilesInHome(configSchema) {
@@ -19,7 +18,7 @@ export async function setupFilesInHome(configSchema) {
 /**
  * Assumes config exists
  */
-export async function prompt(configDir = BOUNTY_CONFIG) {
+export async function promptForInfo(configDir = BOUNTY_CONFIG) {
   const config = getConfig()
   if (config.headers['Harvest-Account-ID'] !== null && config.headers['Authorization'] !== null)
     return

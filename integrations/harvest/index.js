@@ -1,5 +1,6 @@
 
 import dateUtils from '../../dateUtils.js'
+
 import {
   CONFIG_SCHEMA,
   IGNORE_IDS
@@ -7,14 +8,14 @@ import {
 
 import {
   setupFilesInHome,
-  prompt,
+  promptForInfo,
   getConfig,
   timeEntryGenerator
 } from './utils.js'
 
 export async function beforeRun(configSchema = CONFIG_SCHEMA) {
   await setupFilesInHome(configSchema)
-  await prompt()
+  await promptForInfo()
 }
 
 export function getReferenceDate() {
