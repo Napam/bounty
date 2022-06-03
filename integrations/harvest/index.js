@@ -1,15 +1,13 @@
 
 import dateUtils from '../../dateUtils.js'
 import {
-  setupFilesInHome,
-  promptForInfo,
+  setupFilesInHomeAndPromptForInfo,
   getConfig,
   timeEntryGenerator
 } from './utils.js'
 
 export async function beforeRun() {
-  await setupFilesInHome()
-  await promptForInfo()
+  await setupFilesInHomeAndPromptForInfo()
 }
 
 export function getReferenceDate() {
