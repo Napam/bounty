@@ -30,7 +30,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
   const question = string => new Promise(resolve => rl.question(string, resolve))
 
   setConfig(currConfig)
-  console.log()w
+  console.log()
   console.log(`Config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${CONFIG_FILE}\x1b[m`)
   console.log()
   console.log(`If something crashes, make sure that the config values makes sense:`)
