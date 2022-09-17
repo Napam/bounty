@@ -1,7 +1,7 @@
 {
     "name": "bounty",
     "devDependencies": {
-        "jest": "^27.4.7"
+        "jest": "^29.0.3"
     },
     "license": "MIT",
     "type": "module",
@@ -12,6 +12,6 @@
         "bounty": "./index.js"
     },
     "dependencies": {
-        "axios": "^0.25.0"
+        "axios": "^0.27.2"
     }
 }
