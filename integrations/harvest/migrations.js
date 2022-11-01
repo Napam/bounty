@@ -1,5 +1,5 @@
 /**
- * Contains an array if migration functions
+ * Contains an array of migration functions
  *
  * A migration function is used to migrate the config file into newer versions.
  * The functions should be executed sequentially, and they should take the configuration object
@@ -56,7 +56,7 @@ export default [
    * @param {object} config
    */
   async function migrate2(config) {
-    if (config.version === '2') {
+    if (parseInt(config.version) >= 2) {
       return config
     }
 

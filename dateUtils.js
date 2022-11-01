@@ -257,7 +257,7 @@ function* norwegianHolidaysGenerator(from, to) {
 
 /**
  * E.g. given monday to friday, return ['saturday', 'sunday']
- * @param {Array<Date>} days
+ * @param {Array<string>} days
  * @returns
  */
 function getComplementWeekdays(days) {
