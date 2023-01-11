@@ -183,7 +183,7 @@ test('calcFlexBalance test case April 2022 (3 holidays)', () => {
   const expectedWorkDays = 18
   const expectedHoursPerDay = 7.5
   const actualHours = 135
-  const balance = dateUtils.calcFlexBalance(actualHours, referenceDate, referenceBalance, { to })
+  const balance = dateUtils.calcFlexBalance(actualHours, referenceDate, referenceBalance, { to, hoursOnHolidays: 0 })
   expect(balance).toEqual(actualHours - expectedWorkDays * expectedHoursPerDay + referenceBalance)
   expect(balance).toEqual(10)
 })
