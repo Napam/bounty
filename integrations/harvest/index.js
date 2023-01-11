@@ -64,9 +64,14 @@ export async function getWorkHours() {
   return hours
 }
 
-export function getExpectedWorkHoursPerDay() {
+export function getExpectedRegisteredHoursOnWorkdays() {
   const config = getConfig()
-  return config.expectedWorkHoursPerDay
+  return config.expectedRegisteredHoursOnWorkdays
+}
+
+export function getExpectedRegisteredHoursOnHolidays() {
+  const config = getConfig()
+  return config.expectedRegisteredHoursOnHolidays
 }
 
 export async function afterRun({ from, to, balance }) {

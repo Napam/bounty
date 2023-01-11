@@ -314,7 +314,8 @@ function ISOToMs(isodate) {
  *  to: Date,
  *  workdays: Array<string>,
  *  holidays: Iterable<Date>,
- *  workHoursPerDay: number
+ *  expectedRegisteredHoursOnWorkdays: number
+ *  expectedRegisteredHoursOnHolidays: number
  * }} optionals
  * @returns flex balance
  */
@@ -326,14 +327,15 @@ function calcFlexBalance(
     to = getTodayDate(),
     workdays = DEFAULT_WORKDAYS,
     holidays = norwegianHolidaysGenerator(referenceDate, to),
-    workHoursPerDay = 7.5
+    hoursOnWorkdays = 7.5,
+    hoursOnHolidays = 7.5
   } = {}
 ) {
   validateFromToDates(referenceDate, to, { fromAlias: 'referenceDate' })
   const { days: dayCount, ...weekdaysCounts } = countDays(referenceDate, to)
   const holidaysInWorkdays = countHolidaysInWorkdays(holidays, workdays)
   const offdaysCount = getComplementWeekdays(workdays).reduce((acc, day) => acc + weekdaysCounts[day], 0)
-  const expectedHours = (dayCount - holidaysInWorkdays - offdaysCount) * workHoursPerDay
+  const expectedHours = (dayCount - offdaysCount - holidaysInWorkdays) * hoursOnWorkdays + holidaysInWorkdays * hoursOnHolidays
   return actualHours - expectedHours + referenceBalance
 }
 

@@ -51,6 +51,7 @@ export default [
       referenceBalance: parseFloat(referenceBalance),
     }
   },
+
   /**
    * Add version, expectedWorkHoursPerDay and entriesToIgnore
    * @param {object} config
@@ -77,5 +78,31 @@ export default [
         { project: 'Absence', task: 'Time off' }
       ]
     }
+  },
+
+  /**
+    * Rename expectedWorkHoursPerDay to expectedRegisteredHoursOnWorkdays
+    * Add expectedRegisteredHoursOnHolidays
+    * @param {object} config
+    */
+  async function migrate3(config) {
+    if (parseInt(config.version) >= 3) {
+      return config
+    }
+
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+    const question = string => new Promise(resolve => rl.question(string, resolve))
+    const expectedRegisteredHoursOnHolidays = await question('Enter expected registered hours on holidays (float, default 7.5): ')
+    rl.close()
+
+    const newConfig = {
+      ...config,
+      version: '3',
+      expectedRegisteredHoursOnWorkdays: config.expectedWorkHoursPerDay,
+      expectedRegisteredHoursOnHolidays: expectedRegisteredHoursOnHolidays.length ? parseFloat(expectedRegisteredHoursOnHolidays) : 7.5,
+    }
+
+    delete newConfig.expectedWorkHoursPerDay
+    return newConfig
   }
 ]
