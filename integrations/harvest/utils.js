@@ -9,7 +9,7 @@ import {
 
 export async function setupFilesInHomeAndPromptForInfo() {
   const bootstrapFiles = async () => {
-    await fs.mkdir(CONFIG_DIR, { recursive: true }, error => {
+    fs.mkdir(CONFIG_DIR, { recursive: true }, error => {
       if (error) throw new Error(`Error when attempting to create directory in ${CONFIG_DIR}: ${error}`)
     })
     return fs.existsSync(CONFIG_FILE) ? getConfig() : {}

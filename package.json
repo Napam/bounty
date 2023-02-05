@@ -8,8 +8,9 @@
     "scripts": {
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
     },
+    "main": "./index.js",
     "bin": {
-        "bounty": "./index.js"
+        "bounty": "./cli.js"
     },
     "dependencies": {
         "axios": "^0.27.2"
