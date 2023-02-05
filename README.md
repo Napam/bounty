@@ -3,9 +3,7 @@
 - npm
 
 # Install
-1. `npm install` &rarr; *install required modules*
-2. `npm link` &rarr; *makes bounty available everywhere*
-3. `bounty` &rarr; *run bounty*
+1. `npm install -g @napam/bounty`
 
 # Info
 The first `bounty` call will prompt for user info. The info is then stored in `~/.bounty/config.json`, which you can alter manually in case you want to change something, or maybe the prompt failed. The config is for example
