@@ -1,5 +1,6 @@
 {
     "name": "@napam/bounty",
+    "private": false,
     "version": "0.0.1",
     "devDependencies": {
         "jest": "^29.0.3"
