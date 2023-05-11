@@ -10,9 +10,12 @@ export async function beforeRun() {
   await setupFilesInHomeAndPromptForInfo()
 }
 
-export function getReferenceDate() {
-  const isodateToDate = isodate => new Date(isodate.split('-'))
+function isodateToDate(isoDate) {
+  let [year, month, day] = isoDate.split('-').map(x => parseInt(x))
+  return new Date(year, month - 1, day)
+}
 
+export function getReferenceDate() {
   const config = getConfig()
   if (config.referenceDate)
     return isodateToDate(config.referenceDate)
