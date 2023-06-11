@@ -62,8 +62,10 @@ export async function getWorkHours() {
   }
 
   let hours = 0
-  for await (let timeEntry of timeEntryGenerator(config.headers, from))
+  for await (let timeEntry of timeEntryGenerator(config.headers, from, dateUtils.getTodayDate())) {
     hours += zeroIfShouldIgnore(timeEntry) * timeEntry.hours
+  }
+
   return hours
 }
 

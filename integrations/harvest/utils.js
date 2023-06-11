@@ -52,14 +52,14 @@ export function setConfig(config) {
 }
 
 /**
- * 
  * @param {object} headers headers to send to harvest
  * @param {string} from string of YYYY-MM-DD
+ * @param {string} to string of YYYY-MM-DD
  */
-export async function* timeEntryGenerator(headers, from) {
+export async function* timeEntryGenerator(headers, from, to) {
   try {
     const get = async (url, params) => (await axios.get(url, { headers, params })).data
-    let res = await get('https://api.harvestapp.com/v2/time_entries', { from })
+    let res = await get('https://api.harvestapp.com/v2/time_entries', { from, to })
     do for (let timeEntry of res.time_entries) yield timeEntry
     while (res.links.next && (res = await get(res.links.next)))
   } catch (error) {
