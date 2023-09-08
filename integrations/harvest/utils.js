@@ -7,6 +7,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
   const bootstrapFiles = async () => {
     return fs.existsSync(CONFIG_FILE) ? getConfig() : {};
   };
+
   // Now assume config file has never been incorrectly altered
   let initConfig = await bootstrapFiles();
   const migrationFunctions = (await import('./migrations.js')).default;
