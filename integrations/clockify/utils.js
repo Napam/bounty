@@ -92,13 +92,26 @@ export async function setupFilesInHomeAndPromptForInfo() {
 /** @type {ClockifyConfig | null} */
 let config = null;
 
-/**
- * @returns {ClockifyConfig}
- */
+/** @returns {ClockifyConfig} */
 export function getConfig() {
   if (config != null) {
     return config;
   }
   config = JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
   return config;
+}
+
+const hhmmRegex = /^(\d+):(\d+)$/;
+
+/**
+ * @param {string} hhmm - string in HH:MM format, can also be like 1234:456
+ * @returns {number}
+ */
+export function parseHHMM(hhmm) {
+  if (!hhmmRegex.test(hhmm)) {
+    throw new Error(`Invalid HH:MM string: ${hhmm}`);
+  }
+
+  const [hoursString, minutesString] = hhmm.split(':');
+  return parseInt(hoursString) + parseInt(minutesString) / 60;
 }

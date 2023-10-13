@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
-import dateUtils from './dateUtils.js';
+import * as dateUtils from './dateUtils.js';
 import { BOUNTY_CONFIG_DIR, BOUNTY_CORE_CONFIG_FILE } from './constants.js';
 import { CONFIG_FILE as HARVEST_CONFIG_FILE } from './integrations/harvest/constants.js';
 import inquirer from 'inquirer';
@@ -67,9 +67,7 @@ async function initalizeBountyConfig() {
 
   fs.mkdir(BOUNTY_CONFIG_DIR, { recursive: true }, (error) => {
     if (error) {
-      throw new Error(
-        `Error when attempting to create directory ${BOUNTY_CONFIG_DIR}: ${error}`
-      );
+      throw new Error(`Error when attempting to create directory ${BOUNTY_CONFIG_DIR}: ${error}`);
     }
   });
 
@@ -79,8 +77,8 @@ async function initalizeBountyConfig() {
     message: 'Select the time registration system that you use:',
     choices: [
       { name: 'Harvest', value: 'harvest' },
-      { name: 'Clockify', value: 'clockify' }
-    ]
+      { name: 'Clockify', value: 'clockify' },
+    ],
   });
 
   const config = { version: '1', integration };
@@ -104,14 +102,14 @@ async function getIntegration(config) {
   return await import(
     {
       harvest: './integrations/harvest/index.js',
-      clockify: './integrations/clockify/index.js'
+      clockify: './integrations/clockify/index.js',
     }[config.integration]
   );
 }
 
 function incrementDateIfBeforeToday(date) {
   return dateUtils.offsetDate(date, {
-    days: date.getTime() < dateUtils.getTodayDate().getTime()
+    days: date.getTime() < dateUtils.getTodayDate().getTime(),
   });
 }
 
@@ -124,7 +122,7 @@ async function run() {
     getExpectedRegisteredHoursOnHolidays,
     getReferenceDate,
     getReferenceBalance,
-    afterRun
+    afterRun,
   } = await getIntegration(bountyConfig);
 
   await beforeRun();
@@ -138,7 +136,7 @@ async function run() {
   const balance = dateUtils.calcFlexBalance(workedHours, from, referenceBalance, {
     to,
     hoursOnWorkdays,
-    hoursOnHolidays
+    hoursOnHolidays,
   });
   await afterRun({ from, to, balance });
 }

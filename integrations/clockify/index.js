@@ -1,4 +1,4 @@
-import { setupFilesInHomeAndPromptForInfo, getConfig } from './utils.js';
+import { setupFilesInHomeAndPromptForInfo, getConfig, parseHHMM } from './utils.js';
 import axios from 'axios';
 
 export async function beforeRun() {
@@ -12,16 +12,20 @@ function isodateToDate(isoDate) {
 
 export function getReferenceDate() {
   const config = getConfig();
-  if (config.referenceDate) return isodateToDate(config.referenceDate);
+  if (config.referenceDate == null) {
+    throw new Error('Improper configuration of config');
+  }
 
-  throw new Error('Improper configuration of config');
+  return isodateToDate(config.referenceDate);
 }
 
 export function getReferenceBalance() {
   const config = getConfig();
-  if (config.referenceBalance != null) return config.referenceBalance;
+  if (config.referenceBalance == null) {
+    throw new Error('Improper configuration of config');
+  }
 
-  throw new Error('Improper configuration of config');
+  return parseHHMM(config.referenceBalance);
 }
 
 /**
@@ -45,12 +49,12 @@ export async function getWorkHours() {
           startDate: new Date(config.referenceDate).toISOString(),
           endDate: new Date().toISOString(),
           access: 'ME',
-          type: 'PROJECT'
+          type: 'PROJECT',
         },
         {
           headers: {
-            'X-Api-Key': config.apiKey
-          }
+            'X-Api-Key': config.apiKey,
+          },
         }
       )
     ).data;
@@ -60,24 +64,29 @@ export async function getWorkHours() {
   }
 
   const {
-    groups: { hours: hoursString, minutes: minutesString }
+    groups: { hours: hoursString, minutes: minutesString },
   } = clockifyTimeRegex.exec(result.totalTime);
 
   const workHours = parseInt(hoursString) + parseInt(minutesString) / 60;
+  return workHours;
 }
 
 export function getExpectedRegisteredHoursOnWorkdays() {
   const config = getConfig();
-  if (config.expectedRegisteredHoursOnWorkdays) return config.expectedRegisteredHoursOnWorkdays;
+  if (!config.expectedRegisteredHoursOnWorkdays == null) {
+    throw new Error('Improper configuration of config');
+  }
 
-  throw new Error('Improper configuration of config');
+  return parseHHMM(config.expectedRegisteredHoursOnWorkdays);
 }
 
 export function getExpectedRegisteredHoursOnHolidays() {
   const config = getConfig();
-  if (config.expectedRegisteredHoursOnHolidays) return config.expectedRegisteredHoursOnHolidays;
+  if (config.expectedRegisteredHoursOnHolidays == null) {
+    throw new Error('Improper configuration of config');
+  }
 
-  throw new Error('Improper configuration of config');
+  return parseHHMM(config.expectedRegisteredHoursOnHolidays);
 }
 
 export async function afterRun({ from, to, balance }) {
