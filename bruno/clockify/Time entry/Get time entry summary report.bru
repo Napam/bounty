@@ -1,0 +1,25 @@
+meta {
+  name: Get time entry summary report
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://reports.api.clockify.me/v1/workspaces/{{workspaceId}}/reports/summary
+  body: json
+  auth: none
+}
+
+headers {
+  X-Api-Key: {{apiKey}}
+}
+
+body:json {
+  {
+    "dateRangeStart": "2023-10-01T05:00:00Z",
+    "dateRangeEnd": "2023-10-10T05:00:00Z",
+    "summaryFilter": {
+      "groups": ["users"]
+    }
+  }
+}

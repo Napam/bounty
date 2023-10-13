@@ -1,0 +1,24 @@
+meta {
+  name: Get dashboard summary
+  type: http
+  seq: 3
+}
+
+post {
+  url: https://global.api.clockify.me/workspaces/{{workspaceId}}/reports/dashboard-info
+  body: json
+  auth: none
+}
+
+headers {
+  X-Api-Key: {{apiKey}}
+}
+
+body:json {
+  {
+    "startDate": "2023-08-01T00:00:00.000Z",
+    "endDate": "2023-10-13T23:59:59.999Z",
+    "access": "ME",
+    "type": "PROJECT"
+  }
+}

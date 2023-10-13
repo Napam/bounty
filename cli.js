@@ -2,13 +2,13 @@
 
 import fs from 'fs';
 import dateUtils from './dateUtils.js';
-import { CONFIG_DIR, CONFIG_FILE } from './constants.js';
+import { BOUNTY_CONFIG_DIR, BOUNTY_CORE_CONFIG_FILE } from './constants.js';
 import { CONFIG_FILE as HARVEST_CONFIG_FILE } from './integrations/harvest/constants.js';
 import inquirer from 'inquirer';
 
 /**
  * Config file
- * @typedef {Object} Config
+ * @typedef {Object} BountyConfig
  * @property {string} version
  * @property {'harvest' | 'clockify'} integration
  */
@@ -34,7 +34,7 @@ import inquirer from 'inquirer';
  * It will figure it out by checking if the config is missing some of the values that bounty core must have.
  *
  * Returns true if the config had to be moved, else false
- * @param {Config} config
+ * @param {BountyConfig} config
  * @returns {boolean}
  */
 function moveOldHarvestConfigIfNeeded(config) {
@@ -43,18 +43,21 @@ function moveOldHarvestConfigIfNeeded(config) {
   }
 
   console.log(
-    `Found old harvest config file at ${CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}}`
+    `Found old harvest config file at ${BOUNTY_CORE_CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}}`
   );
-  fs.rename(CONFIG_FILE, HARVEST_CONFIG_FILE, (error) => {
+  fs.rename(BOUNTY_CORE_CONFIG_FILE, HARVEST_CONFIG_FILE, (error) => {
     if (error) {
-      throw new Error(`Could not rename ${CONFIG_FILE} to ${HARVEST_CONFIG_FILE}`);
+      throw new Error(`Could not rename ${BOUNTY_CORE_CONFIG_FILE} to ${HARVEST_CONFIG_FILE}`);
     }
   });
   return true;
 }
 
+/**
+ * @returns {Promise<BountyConfig>}
+ */
 async function initalizeBountyConfig() {
-  if (fs.existsSync(CONFIG_FILE)) {
+  if (fs.existsSync(BOUNTY_CORE_CONFIG_FILE)) {
     const config = getConfig();
 
     if (!moveOldHarvestConfigIfNeeded(config)) {
@@ -62,9 +65,11 @@ async function initalizeBountyConfig() {
     }
   }
 
-  fs.mkdir(CONFIG_DIR, { recursive: true }, (error) => {
+  fs.mkdir(BOUNTY_CONFIG_DIR, { recursive: true }, (error) => {
     if (error) {
-      throw new Error(`Error when attempting to create directory ${CONFIG_DIR}: ${error}`);
+      throw new Error(
+        `Error when attempting to create directory ${BOUNTY_CONFIG_DIR}: ${error}`
+      );
     }
   });
 
@@ -79,20 +84,20 @@ async function initalizeBountyConfig() {
   });
 
   const config = { version: '1', integration };
-  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+  fs.writeFileSync(BOUNTY_CORE_CONFIG_FILE, JSON.stringify(config, null, 2));
   return config;
 }
 
 /**
  * @param
- * @returns {Config} Bounty configuration
+ * @returns {BountyConfig} Bounty configuration
  */
 function getConfig() {
-  return JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
+  return JSON.parse(fs.readFileSync(BOUNTY_CORE_CONFIG_FILE).toString());
 }
 
 /**
- * @param {Config} config
+ * @param {BountyConfig} config
  * @returns {Promise<Integration>}
  */
 async function getIntegration(config) {
@@ -111,7 +116,7 @@ function incrementDateIfBeforeToday(date) {
 }
 
 async function run() {
-  const config = await initalizeBountyConfig();
+  const bountyConfig = await initalizeBountyConfig();
   const {
     beforeRun,
     getWorkHours,
@@ -120,7 +125,7 @@ async function run() {
     getReferenceDate,
     getReferenceBalance,
     afterRun
-  } = await getIntegration(config);
+  } = await getIntegration(bountyConfig);
 
   await beforeRun();
   const workedHours = await getWorkHours();

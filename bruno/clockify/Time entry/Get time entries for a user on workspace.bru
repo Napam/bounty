@@ -1,0 +1,15 @@
+meta {
+  name: Get time entries for a user on workspace
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.clockify.me/api/v1/workspaces/{{workspaceId}}/user/{{userId}}/time-entries
+  body: none
+  auth: none
+}
+
+headers {
+  X-Api-Key: {{apiKey}}
+}

@@ -1,0 +1,16 @@
+{
+  "version": "1",
+  "name": "Clockify",
+  "type": "collection",
+  "proxy": {
+    "enabled": false,
+    "protocol": "http",
+    "hostname": "",
+    "port": "",
+    "auth": {
+      "enabled": false,
+      "username": "",
+      "password": ""
+    }
+  }
+}
