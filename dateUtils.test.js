@@ -1,5 +1,5 @@
 import { expect } from "@jest/globals"
-import dateUtils from './dateUtils.js'
+import * as dateUtils from './dateUtils.js'
 
 test('offsetDate', () => {
   expect(dateUtils.offsetDate(new Date(2022, 11, 18), { years: 2, months: -4, days: 7 }))

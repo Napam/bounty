@@ -227,8 +227,8 @@ export function slowCountDays(from, to) {
 
 /**
  * Aggregates array of objects.
- * @param {Array<object>} objects, array of objects with identical properties
- * @param {Function} aggregator, function to aggregate values
+ * @param {Array<object>} objects - array of objects with identical properties
+ * @param {Function} aggregator - function to aggregate values
  * @returns {object}
  */
 export function aggregate(objects, aggregator = (x, y) => x + y) {
@@ -304,6 +304,23 @@ export function getTodayISO() {
  */
 export function ISOToMs(isodate) {
   return new Date(isodate.split('T')[0].split('-')).getTime()
+}
+
+/**
+ * Turn Javascript date into YYYY-MM-DDTHH:MM:SSZ format with "zeroed" timezone offset
+ * @param {Date} date
+ */
+export function dateToISODatetimeWithoutOffset(date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString()
+}
+
+/**
+ * Turn Javascript date into YYYY-MM-DD, will zero out offset
+ * E.g. a Date object of 2023-08-13T22:00:00.000Z will become 2023-08-14 in Norway 
+ * @param {Date} date
+ */
+export function dateToISODate(date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0]
 }
 
 /**

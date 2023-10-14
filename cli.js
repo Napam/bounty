@@ -17,12 +17,12 @@ import inquirer from 'inquirer';
  * Integration module
  * @typedef {Object} Integration
  * @property {() => Promise<void> | void} beforeRun
- * @property {() => Promise<number> | number} getWorkHours
+ * @property {(from: Date, to: Date) => Promise<number> | number} getWorkHours
  * @property {() => Promise<number> | number} getExpectedRegisteredHoursOnWorkdays
  * @property {() => Promise<number> | number} getExpectedRegisteredHoursOnHolidays
  * @property {() => Promise<Date> | Date} getReferenceDate
  * @property {() => Promise<number> | number} getReferenceBalance
- * @property {() => Promise<void> | void} afterRun
+ * @property {(from: Date, to: Date, balance: number) => Promise<void> | void} afterRun
  */
 
 /**
@@ -42,9 +42,7 @@ function moveOldHarvestConfigIfNeeded(config) {
     return false;
   }
 
-  console.log(
-    `Found old harvest config file at ${BOUNTY_CORE_CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}}`
-  );
+  console.log(`Found old harvest config file at ${BOUNTY_CORE_CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}}`);
   fs.rename(BOUNTY_CORE_CONFIG_FILE, HARVEST_CONFIG_FILE, (error) => {
     if (error) {
       throw new Error(`Could not rename ${BOUNTY_CORE_CONFIG_FILE} to ${HARVEST_CONFIG_FILE}`);
@@ -126,13 +124,12 @@ async function run() {
   } = await getIntegration(bountyConfig);
 
   await beforeRun();
-  const workedHours = await getWorkHours();
+  const from = incrementDateIfBeforeToday(await getReferenceDate());
+  const to = dateUtils.getTodayDate();
+  const workedHours = await getWorkHours(from, to);
+  const referenceBalance = await getReferenceBalance();
   const hoursOnWorkdays = await getExpectedRegisteredHoursOnWorkdays();
   const hoursOnHolidays = await getExpectedRegisteredHoursOnHolidays();
-  const referenceDate = await getReferenceDate();
-  const referenceBalance = await getReferenceBalance();
-  const from = incrementDateIfBeforeToday(referenceDate);
-  const to = dateUtils.getTodayDate();
   const balance = dateUtils.calcFlexBalance(workedHours, from, referenceBalance, {
     to,
     hoursOnWorkdays,
