@@ -86,6 +86,8 @@ export async function setupFilesInHomeAndPromptForInfo() {
     process.exit();
   }
 
+  config.version = '1'
+
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
 }
 
