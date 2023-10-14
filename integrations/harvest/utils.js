@@ -3,6 +3,21 @@ import axios from 'axios';
 import readline from 'readline';
 import { CONFIG_FILE } from './constants.js';
 
+/**
+ * @typedef {Object} HarvestConfig
+ * @property {string} version - The version of the data.
+ * @property {Object} headers - The headers for the request.
+ * @property {string} headers.Harvest-Account-ID - The Harvest Account ID.
+ * @property {string} headers.Authorization - The Authorization token.
+ * @property {string} referenceDate - The reference date in YYYY-MM-DD format.
+ * @property {number} referenceBalance - The reference balance.
+ * @property {Array.<Object>} entriesToIgnore - An array of entries to ignore.
+ * @property {string} entriesToIgnore[].project - The project name of the entry to ignore.
+ * @property {string} entriesToIgnore[].task - The task name of the entry to ignore.
+ * @property {number} expectedRegisteredHoursOnWorkdays - The expected registered hours on workdays.
+ * @property {number} expectedRegisteredHoursOnHolidays - The expected registered hours on holidays.
+ */
+
 export async function setupFilesInHomeAndPromptForInfo() {
   const bootstrapFiles = async () => {
     return fs.existsSync(CONFIG_FILE) ? getConfig() : {};
@@ -37,6 +52,9 @@ export function cleanConfig() {
   fs.rmSync(CONFIG_DIR, { recursive: true, force: true });
 }
 
+/**
+ * @returns {HarvestConfig}
+ */
 export function getConfig() {
   return JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
 }

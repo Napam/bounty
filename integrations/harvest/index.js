@@ -1,5 +1,4 @@
-
-import dateUtils from '../../dateUtils.js'
+import * as dateUtils from '../../dateUtils.js'
 import {
   setupFilesInHomeAndPromptForInfo,
   getConfig,
@@ -31,23 +30,12 @@ export function getReferenceBalance() {
   throw new Error("Improper configuration of config")
 }
 
-export async function getWorkHours() {
+/**
+ * @param {Date} from
+ * @param {Date} to
+ */
+export async function getWorkHours(from, to) {
   const config = getConfig()
-  let from = dateUtils.offsetISODate(
-    config.referenceDate,
-    { days: dateUtils.ISOToMs(config.referenceDate) < dateUtils.getTodayDate().getTime() }
-  )
-
-  // Example of project and client objects from Harvest
-  // "project": {
-  //   "id": 12345678,
-  //   "name": "Absence",
-  //   "code": "Absence"
-  // }
-  // "task": {
-  //     "id": 12345678,
-  //     "name": "Leave - Paid"
-  // }
 
   const zeroIfShouldIgnore = timeEntry => {
     for (const { project: projectName, task: taskName } of config.entriesToIgnore) {
@@ -62,7 +50,7 @@ export async function getWorkHours() {
   }
 
   let hours = 0
-  for await (let timeEntry of timeEntryGenerator(config.headers, from, dateUtils.getTodayDate())) {
+  for await (let timeEntry of timeEntryGenerator(config.headers, dateUtils.dateToISODate(from), dateUtils.dateToISODate(to))) {
     hours += zeroIfShouldIgnore(timeEntry) * timeEntry.hours
   }
 
@@ -79,7 +67,10 @@ export function getExpectedRegisteredHoursOnHolidays() {
   return config.expectedRegisteredHoursOnHolidays
 }
 
-export async function afterRun({ from, to, balance }) {
+/**
+ * @param {{to: Date, from: Date , balance: number}} obj
+ * */
+export async function afterRun({ balance }) {
   console.log('referenceDate :>> ', getReferenceDate().toLocaleDateString("no-NB"))
   console.log('referenceBalance :>> ', getReferenceBalance())
   console.log('currDate :>> ', new Date().toLocaleDateString("no-NB"))
