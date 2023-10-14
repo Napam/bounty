@@ -58,7 +58,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
 
   try {
     const response = await axios.get('https://api.clockify.me/api/v1/user', {
-      headers: { 'x-api-key': config.apiKey },
+      headers: { 'X-Api-Key': config.apiKey },
     });
     config.userId = response.data.id;
   } catch (error) {
