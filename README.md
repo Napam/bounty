@@ -21,10 +21,17 @@ to change something, or maybe the prompt failed. The core config is for example
 ```
 
 Bounty is implemented to be "provider agnostic", such that one can implement
-support for different providers. The config is used to specify which provder one
-wants to use. Each provider has their own config files in `~/.bounty`.
+support for different providers. The config is used to specify which provider one
+wants to use. Each provider has their own config files in `~/.bounty/`.
 
-## Harvest
+## Providers
+There has been implemented integrations for two providers so for: Clockify and
+Harvest. Note that bounty can significantly differ in usage based on one
+provider from another. For instance, Clockify usees HH:MM as time format, while
+Harvest uses decimal values.
+
+### Harvest
+
 The config file for Harvest is `~/.bounty/harvest.json`, here is an example:
 
 ```json
@@ -47,14 +54,14 @@ The config file for Harvest is `~/.bounty/harvest.json`, here is an example:
 }
 ```
 
-**It is possible to manually edit the config files**. You can get your Harvest
-info at https://id.getharvest.com/developers. The properties `referenceDate` and
-`referenceBalance` are used to accomodate for your previous flex balance. That
-is, for the property `referenceDate` enter an earlier date (`YYYY-MM-DD`) of
-which you knew your flextime, and for propery `referenceBalance` enter said
-flextime.
+You can get your Harvest info at https://id.getharvest.com/developers. The
+properties `referenceDate` and `referenceBalance` are used to accomodate for 
+your previous flex balance. That is, for the property `referenceDate` enter
+an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for 
+property `referenceBalance` enter said flextime.
 
-## Clockify
+### Clockify
+
 The config file for Clockify is `~/.bounty/clockify.json`, here is an example:
 
 ```json
@@ -69,3 +76,11 @@ The config file for Clockify is `~/.bounty/clockify.json`, here is an example:
   "workspaceId": "workspaceid4206969696969696969"
 }
 ```
+
+You can get your Clockify info at https://app.clockify.me/user/settings. The
+properties `referenceDate` and `referenceBalance` are used to accomodate for 
+your previous flex balance. That is, for the property `referenceDate` enter
+an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for 
+property `referenceBalance` enter said flextime. The values for userId will
+get inferred from your API key, but you will have to select / obtain a
+workspaceId.
