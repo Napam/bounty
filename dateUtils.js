@@ -303,6 +303,45 @@ export function dateToISODate(date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 }
 
+const ISODurationPattern = /P((?<years>\d+)Y)?((?<months>\d+)M)?((?<days>\d+)D)?T((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/;
+
+/**
+ * Parses ISO duration string to its components as numerical values
+ * @param {string} durationString - E.g. P3Y6M4DT12H30M5S
+ * @return A date object representing the time duration .
+ */
+export function parseISODuration(durationString) {
+  const result = ISODurationPattern.exec(durationString);
+  if (result === null) throw new Error(`Invalid ISO duration string: ${durationString}`);
+
+  const { years, months, days, hours, minutes, seconds } = result.groups;
+  return {
+    years: parseInt(years ?? '0'),
+    months: parseInt(months ?? '0'),
+    days: parseInt(days ?? '0'),
+    hours: parseInt(hours ?? '0'),
+    minutes: parseInt(minutes ?? '0'),
+    seconds: parseInt(seconds ?? '0'),
+  };
+}
+
+/**
+ * Parses ISO duration string to a Date object
+ * @param {string} durationString - E.g. P3Y6M4DT12H30M5S
+ * @return {Date} A date object representing the time duration .
+ */
+export function ISODurationToDate(durationString) {
+  const durationParts = parseISODuration(durationString);
+  return new Date(
+    durationParts.years,
+    durationParts.months,
+    durationParts.days,
+    durationParts.hours,
+    durationParts.minutes,
+    durationParts.seconds
+  );
+}
+
 /**
  * @param {number} actualHours
  * @param {Date} referenceDate

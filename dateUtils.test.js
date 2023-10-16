@@ -1,6 +1,20 @@
 import { expect } from '@jest/globals';
 import * as dateUtils from './dateUtils.js';
 
+test('aggregate works', () => {
+  const objects = [
+    { a: 1, b: 2 },
+    { a: 3, b: 4 },
+    { a: 5, b: 6 },
+  ];
+  const aggregator = (x, y) => x + y;
+  const expected = { a: 9, b: 12 };
+
+  const result = dateUtils.aggregate(objects, aggregator);
+
+  expect(result).toEqual(expected);
+});
+
 test('offsetDate', () => {
   expect(dateUtils.offsetDate(new Date(2022, 11, 18), { years: 2, months: -4, days: 7 })).toEqual(new Date(2024, 7, 25));
 });
@@ -178,4 +192,21 @@ test('calcFlexBalance test case April 2022 (3 holidays)', () => {
   const balance = dateUtils.calcFlexBalance(actualHours, referenceDate, referenceBalance, { to, hoursOnHolidays: 0 });
   expect(balance).toEqual(actualHours - expectedWorkDays * expectedHoursPerDay + referenceBalance);
   expect(balance).toEqual(10);
+});
+
+test('parseISODuration works', () => {
+  const components = dateUtils.parseISODuration('P1Y2M3DT4H5M6S');
+  expect(components).toEqual({
+    years: 1,
+    months: 2,
+    days: 3,
+    hours: 4,
+    minutes: 5,
+    seconds: 6,
+  });
+});
+
+test('ISODurationToDate works', () => {
+  const date = dateUtils.ISODurationToDate('P1Y2M3DT4H5M6S');
+  expect(date).toEqual(new Date(1, 2, 3, 4, 5, 6));
 });
