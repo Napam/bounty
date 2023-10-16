@@ -45,10 +45,10 @@ export default [
     return {
       headers: {
         'Harvest-Account-ID': accountId,
-        Authorization: 'Bearer ' + token
+        Authorization: 'Bearer ' + token,
       },
       referenceDate: referenceDate,
-      referenceBalance: parseFloat(referenceBalance)
+      referenceBalance: parseFloat(referenceBalance),
     };
   },
 
@@ -71,14 +71,12 @@ export default [
       version: '2',
       headers: {
         'Harvest-Account-ID': config.headers['Harvest-Account-ID'],
-        Authorization: config.headers['Authorization']
+        Authorization: config.headers['Authorization'],
       },
       referenceDate: config.referenceDate,
       referenceBalance: config.referenceBalance,
-      expectedWorkHoursPerDay: expectedWorkHoursPerDay.length
-        ? parseFloat(expectedWorkHoursPerDay)
-        : 7.5,
-      entriesToIgnore: [{ project: 'Absence', task: 'Time off' }]
+      expectedWorkHoursPerDay: expectedWorkHoursPerDay.length ? parseFloat(expectedWorkHoursPerDay) : 7.5,
+      entriesToIgnore: [{ project: 'Absence', task: 'Time off' }],
     };
   },
 
@@ -105,10 +103,10 @@ export default [
       expectedRegisteredHoursOnWorkdays: config.expectedWorkHoursPerDay,
       expectedRegisteredHoursOnHolidays: expectedRegisteredHoursOnHolidays.length
         ? parseFloat(expectedRegisteredHoursOnHolidays)
-        : 7.5
+        : 7.5,
     };
 
     delete newConfig.expectedWorkHoursPerDay;
     return newConfig;
-  }
+  },
 ];

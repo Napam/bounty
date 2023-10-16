@@ -49,7 +49,8 @@ export function calcEasterSunday(year) {
   const g = y % 19;
   const c = Math.floor(y / 100);
   const h = (c - Math.floor(c / 4) - Math.floor((8 * c + 13) / 25) + 19 * g + 15) % 30;
-  const i = h - Math.floor(h / 28) * (1 - Math.floor(h / 28) * Math.floor(29 / (h + 1)) * Math.floor((21 - g) / 11));
+  const i =
+    h - Math.floor(h / 28) * (1 - Math.floor(h / 28) * Math.floor(29 / (h + 1)) * Math.floor((21 - g) / 11));
   const j = (y + Math.floor(y / 4) + i + 2 - c + Math.floor(c / 4)) % 7;
   const p = i - j;
   const d = 1 + ((p + 27 + Math.floor((p + 6) / 40)) % 31);
@@ -63,7 +64,10 @@ export function calcEasterSunday(year) {
  * @param offsets
  * @returns new date with offsets
  */
-export function offsetDate(date, { years = 0, months = 0, days = 0, hours = 0, minutes = 0, seconds = 0, milliseconds = 0 } = {}) {
+export function offsetDate(
+  date,
+  { years = 0, months = 0, days = 0, hours = 0, minutes = 0, seconds = 0, milliseconds = 0 } = {}
+) {
   return new Date(
     date.getFullYear() + years,
     date.getMonth() + months,
@@ -139,7 +143,8 @@ export function inWeekend(date) {
  * @returns
  */
 export function validateFromToDates(from, to, { fromAlias = 'from', toAlias = 'to' } = {}) {
-  if (from.getTime() > to.getTime()) throw new Error(`"${fromAlias}" date cannot be later than "${toAlias}" date`);
+  if (from.getTime() > to.getTime())
+    throw new Error(`"${fromAlias}" date cannot be later than "${toAlias}" date`);
 }
 
 /**
@@ -303,7 +308,8 @@ export function dateToISODate(date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 }
 
-const ISODurationPattern = /P((?<years>\d+)Y)?((?<months>\d+)M)?((?<days>\d+)D)?T((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/;
+const ISODurationPattern =
+  /P((?<years>\d+)Y)?((?<months>\d+)M)?((?<days>\d+)D)?T((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/;
 
 /**
  * Parses ISO duration string to its components as numerical values
@@ -371,7 +377,8 @@ export function calcFlexBalance(
   const { days: dayCount, ...weekdaysCounts } = countDays(referenceDate, to);
   const holidaysInWorkdays = countHolidaysInWorkdays(holidays, workdays);
   const offdaysCount = getComplementWeekdays(workdays).reduce((acc, day) => acc + weekdaysCounts[day], 0);
-  const expectedHours = (dayCount - offdaysCount - holidaysInWorkdays) * hoursOnWorkdays + holidaysInWorkdays * hoursOnHolidays;
+  const expectedHours =
+    (dayCount - offdaysCount - holidaysInWorkdays) * hoursOnWorkdays + holidaysInWorkdays * hoursOnHolidays;
   return actualHours - expectedHours + referenceBalance;
 }
 

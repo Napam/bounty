@@ -42,7 +42,9 @@ function moveOldHarvestConfigIfNeeded(config) {
     return false;
   }
 
-  console.log(`Found old harvest config file at ${BOUNTY_CORE_CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}}`);
+  console.log(
+    `Found old harvest config file at ${BOUNTY_CORE_CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}}`
+  );
   fs.rename(BOUNTY_CORE_CONFIG_FILE, HARVEST_CONFIG_FILE, (error) => {
     if (error) {
       throw new Error(`Could not rename ${BOUNTY_CORE_CONFIG_FILE} to ${HARVEST_CONFIG_FILE}`);

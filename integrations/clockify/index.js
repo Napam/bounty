@@ -43,7 +43,9 @@ export async function getWorkHours(from, to) {
   const workspaceId = config.workspaceId;
 
   const startDate = dateUtils.dateToISODatetimeWithoutOffset(dateUtils.offsetDate(from));
-  const endDate = dateUtils.dateToISODatetimeWithoutOffset(dateUtils.offsetDate(to, { days: 1, seconds: -1 }));
+  const endDate = dateUtils.dateToISODatetimeWithoutOffset(
+    dateUtils.offsetDate(to, { days: 1, seconds: -1 })
+  );
 
   /** @type {ClockifyDashboardInfoResponse} */
   let result;

@@ -16,7 +16,9 @@ test('aggregate works', () => {
 });
 
 test('offsetDate', () => {
-  expect(dateUtils.offsetDate(new Date(2022, 11, 18), { years: 2, months: -4, days: 7 })).toEqual(new Date(2024, 7, 25));
+  expect(dateUtils.offsetDate(new Date(2022, 11, 18), { years: 2, months: -4, days: 7 })).toEqual(
+    new Date(2024, 7, 25)
+  );
 });
 
 test('offsetISODate', () => {
@@ -153,7 +155,13 @@ test('calcEasterDates is correct for year 2022', () => {
 });
 
 test('countHolidaysInWorkDays works for April 2022 with norwegianHolidaysGenerator', () => {
-  const workdays = [dateUtils.MONDAY, dateUtils.TUESDAY, dateUtils.WEDNESDAY, dateUtils.THURSDAY, dateUtils.FRIDAY];
+  const workdays = [
+    dateUtils.MONDAY,
+    dateUtils.TUESDAY,
+    dateUtils.WEDNESDAY,
+    dateUtils.THURSDAY,
+    dateUtils.FRIDAY,
+  ];
   const from = new Date(2022, 3, 1);
   const to = new Date(2022, 3, 30);
   const count = dateUtils.countHolidaysInWorkdays(dateUtils.norwegianHolidaysGenerator(from, to), workdays);
@@ -189,7 +197,10 @@ test('calcFlexBalance test case April 2022 (3 holidays)', () => {
   const expectedWorkDays = 18;
   const expectedHoursPerDay = 7.5;
   const actualHours = 135;
-  const balance = dateUtils.calcFlexBalance(actualHours, referenceDate, referenceBalance, { to, hoursOnHolidays: 0 });
+  const balance = dateUtils.calcFlexBalance(actualHours, referenceDate, referenceBalance, {
+    to,
+    hoursOnHolidays: 0,
+  });
   expect(balance).toEqual(actualHours - expectedWorkDays * expectedHoursPerDay + referenceBalance);
   expect(balance).toEqual(10);
 });

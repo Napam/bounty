@@ -26,8 +26,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
     {
       type: 'input',
       name: 'apiKey',
-      message:
-        'Go to https://app.clockify.me/user/settings and obtain an api key and paste it here:',
+      message: 'Go to https://app.clockify.me/user/settings and obtain an api key and paste it here:',
       validate: (input) => input.length > 0,
     },
     {
@@ -86,7 +85,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
     process.exit();
   }
 
-  config.version = '1'
+  config.version = '1';
 
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
 }

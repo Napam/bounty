@@ -25,6 +25,7 @@ support for different providers. The config is used to specify which provider on
 wants to use. Each provider has their own config files in `~/.bounty/`.
 
 ## Providers
+
 There has been implemented integrations for two providers so for: Clockify and
 Harvest. Note that bounty can significantly differ in usage based on one
 provider from another. For instance, Clockify usees HH:MM as time format, while
@@ -55,9 +56,9 @@ The config file for Harvest is `~/.bounty/harvest.json`, here is an example:
 ```
 
 You can get your Harvest info at https://id.getharvest.com/developers. The
-properties `referenceDate` and `referenceBalance` are used to accomodate for 
+properties `referenceDate` and `referenceBalance` are used to accomodate for
 your previous flex balance. That is, for the property `referenceDate` enter
-an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for 
+an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for
 property `referenceBalance` enter said flextime.
 
 ### Clockify
@@ -78,9 +79,9 @@ The config file for Clockify is `~/.bounty/clockify.json`, here is an example:
 ```
 
 You can get your Clockify info at https://app.clockify.me/user/settings. The
-properties `referenceDate` and `referenceBalance` are used to accomodate for 
+properties `referenceDate` and `referenceBalance` are used to accomodate for
 your previous flex balance. That is, for the property `referenceDate` enter
-an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for 
+an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for
 property `referenceBalance` enter said flextime. The values for userId will
 get inferred from your API key, but you will have to select / obtain a
 workspaceId.
