@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
-import * as dateUtils from './dateUtils.js';
-import { BOUNTY_CONFIG_DIR, BOUNTY_CORE_CONFIG_FILE } from './constants.js';
+import { offsetDate, getTodayDate } from './core/dates.js';
+import { calcFlexBalance } from './core/index.js';
+import { BOUNTY_CONFIG_DIR, BOUNTY_CORE_CONFIG_FILE } from './core/constants.js';
 import { CONFIG_FILE as HARVEST_CONFIG_FILE } from './integrations/harvest/constants.js';
 import inquirer from 'inquirer';
 
@@ -108,8 +109,8 @@ async function getIntegration(config) {
 }
 
 function incrementDateIfBeforeToday(date) {
-  return dateUtils.offsetDate(date, {
-    days: date.getTime() < dateUtils.getTodayDate().getTime(),
+  return offsetDate(date, {
+    days: date.getTime() < getTodayDate().getTime(),
   });
 }
 
@@ -127,12 +128,12 @@ async function run() {
 
   await beforeRun();
   const from = incrementDateIfBeforeToday(await getReferenceDate());
-  const to = dateUtils.getTodayDate();
+  const to = getTodayDate();
   const workedHours = await getWorkHours(from, to);
   const referenceBalance = await getReferenceBalance();
   const hoursOnWorkdays = await getExpectedRegisteredHoursOnWorkdays();
   const hoursOnHolidays = await getExpectedRegisteredHoursOnHolidays();
-  const balance = dateUtils.calcFlexBalance(workedHours, from, referenceBalance, {
+  const balance = calcFlexBalance(workedHours, from, referenceBalance, {
     to,
     hoursOnWorkdays,
     hoursOnHolidays,

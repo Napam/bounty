@@ -1,4 +1,4 @@
-import * as dateUtils from '../../dateUtils.js';
+import * as dates from '../../core/dates.js';
 import { setupFilesInHomeAndPromptForInfo, getConfig, timeEntryGenerator } from './utils.js';
 
 export async function beforeRun() {
@@ -43,8 +43,8 @@ export async function getWorkHours(from, to) {
   let hours = 0;
   for await (let timeEntry of timeEntryGenerator(
     config.headers,
-    dateUtils.dateToISODate(from),
-    dateUtils.dateToISODate(to)
+    dates.dateToISODate(from),
+    dates.dateToISODate(to)
   )) {
     hours += zeroIfShouldIgnore(timeEntry) * timeEntry.hours;
   }

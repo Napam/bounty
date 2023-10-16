@@ -1,6 +1,6 @@
 import { setupFilesInHomeAndPromptForInfo, getConfig, parseHHMM } from './utils.js';
 import axios from 'axios';
-import * as dateUtils from '../../dateUtils.js';
+import * as dates from '../../core/dates.js';
 
 export async function beforeRun() {
   await setupFilesInHomeAndPromptForInfo();
@@ -42,9 +42,9 @@ export async function getWorkHours(from, to) {
   const config = getConfig();
   const workspaceId = config.workspaceId;
 
-  const startDate = dateUtils.dateToISODatetimeWithoutOffset(dateUtils.offsetDate(from));
-  const endDate = dateUtils.dateToISODatetimeWithoutOffset(
-    dateUtils.offsetDate(to, { days: 1, seconds: -1 })
+  const startDate = dates.dateToISODatetimeWithoutOffset(dates.offsetDate(from));
+  const endDate = dates.dateToISODatetimeWithoutOffset(
+    dates.offsetDate(to, { days: 1, seconds: -1 })
   );
 
   /** @type {ClockifyDashboardInfoResponse} */
@@ -71,7 +71,7 @@ export async function getWorkHours(from, to) {
     process.exit();
   }
 
-  const { hours, minutes } = dateUtils.parseISODuration(result.totalTime);
+  const { hours, minutes } = dates.parseISODuration(result.totalTime);
   const workHours = hours + minutes / 60;
   return workHours;
 }
