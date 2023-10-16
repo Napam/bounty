@@ -34,7 +34,7 @@ export function getReferenceBalance() {
  * @property {string} totalTime - Total time in the format of PT(?<hours>\d+)H(?<minutes>\d+)M.
  */
 
-const clockifyTimeRegex = /PT(?<hours>\d+)H(?<minutes>\d+)M/;
+const clockifyTimeRegex = /PT((?<hours>\d+)H)?((?<minutes>\d+)M)?/;
 
 /**
  * @param {Date} from
@@ -71,9 +71,12 @@ export async function getWorkHours(from, to) {
     process.exit();
   }
 
-  const {
+  let {
     groups: { hours: hoursString, minutes: minutesString },
   } = clockifyTimeRegex.exec(result.totalTime);
+
+  hoursString = hoursString ?? '0';
+  minutesString = minutesString ?? '0';
 
   const workHours = parseInt(hoursString) + parseInt(minutesString) / 60;
   return workHours;
