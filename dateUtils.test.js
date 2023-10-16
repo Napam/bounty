@@ -154,7 +154,7 @@ test('calcEasterDates is correct for year 2022', () => {
   });
 });
 
-test('countHolidaysInWorkDays works for April 2022 with norwegianHolidaysGenerator', () => {
+test('countDatesOfDays works for April 2022 with norwegianHolidaysGenerator', () => {
   const workdays = [
     dateUtils.MONDAY,
     dateUtils.TUESDAY,
@@ -164,7 +164,7 @@ test('countHolidaysInWorkDays works for April 2022 with norwegianHolidaysGenerat
   ];
   const from = new Date(2022, 3, 1);
   const to = new Date(2022, 3, 30);
-  const count = dateUtils.countHolidaysInWorkdays(dateUtils.norwegianHolidaysGenerator(from, to), workdays);
+  const count = dateUtils.countDatesOfDays(dateUtils.norwegianHolidaysGenerator(from, to), workdays);
   expect(count).toEqual(3);
 });
 

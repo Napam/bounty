@@ -1,14 +1,32 @@
-// These day constants can be any value as long as they can be used as object keys
+/**
+ * @typedef {'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday' } Day
+ **/
+
+/** @type {Day} */
 export const MONDAY = 'monday';
+
+/** @type {Day} */
 export const TUESDAY = 'tuesday';
+
+/** @type {Day} */
 export const WEDNESDAY = 'wednesday';
+
+/** @type {Day} */
 export const THURSDAY = 'thursday';
+
+/** @type {Day} */
 export const FRIDAY = 'friday';
+
+/** @type {Day} */
 export const SATURDAY = 'saturday';
+
+/** @type {Day} */
 export const SUNDAY = 'sunday';
 
 /**
- * Maps the day constants to Date.prototype.getDate() values
+ * Maps the Day enum to Date.prototype.getDate() values
+ *
+ * @type {Map<Day, number>}
  */
 export const DAY_TO_NUM = {
   [MONDAY]: 1,
@@ -22,6 +40,8 @@ export const DAY_TO_NUM = {
 
 /**
  * Maps the Date.prototype.getDate() values to the day constants
+ *
+ * @type {Map<number, Day>}
  */
 export const NUM_TO_DAY = {
   1: MONDAY,
@@ -33,8 +53,10 @@ export const NUM_TO_DAY = {
   0: SUNDAY,
 };
 
+/** @type {Day[]} */
 export const UNIQUE_DAYS = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY];
 
+/** @type {Day[]} */
 export const DEFAULT_WORKDAYS = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY];
 
 /**
@@ -243,7 +265,7 @@ export function* norwegianHolidaysGenerator(from, to) {
 
 /**
  * E.g. given monday to friday, return ['saturday', 'sunday']
- * @param {Array<string>} days
+ * @param {Day[]} days
  * @returns
  */
 export function getComplementWeekdays(days) {
@@ -252,15 +274,17 @@ export function getComplementWeekdays(days) {
 }
 
 /**
- * @param {Iterable<Date>} holidays
- * @param {Array<string>} workdays
+ * @param {Iterable<Date>} dates
+ * @param {Day[]} days
  * @returns
  */
-export function countHolidaysInWorkdays(holidays, workdays) {
-  const workdaySet = new Set(workdays.map((day) => DAY_TO_NUM[day]));
-  let holidaysInWorkdays = 0;
-  for (let holiday of holidays) holidaysInWorkdays += workdaySet.has(holiday.getDay());
-  return holidaysInWorkdays;
+export function countDatesOfDays(dates, days) {
+  const workdaySet = new Set(days.map((day) => DAY_TO_NUM[day]));
+  let datesInDays = 0;
+  for (let date of dates) {
+    datesInDays += workdaySet.has(date.getDay());
+  }
+  return datesInDays;
 }
 
 /**
@@ -354,7 +378,7 @@ export function ISODurationToDate(durationString) {
  * @param {number} referenceBalance
  * @param {{
  *  to: Date,
- *  workdays: Array<string>,
+ *  workdays: Day[],
  *  holidays: Iterable<Date>,
  *  expectedRegisteredHoursOnWorkdays: number
  *  expectedRegisteredHoursOnHolidays: number
@@ -375,10 +399,10 @@ export function calcFlexBalance(
 ) {
   validateFromToDates(referenceDate, to, { fromAlias: 'referenceDate' });
   const { days: dayCount, ...weekdaysCounts } = countDays(referenceDate, to);
-  const holidaysInWorkdays = countHolidaysInWorkdays(holidays, workdays);
+  const holidaysInWorkdays = countDatesOfDays(holidays, workdays);
   const offdaysCount = getComplementWeekdays(workdays).reduce((acc, day) => acc + weekdaysCounts[day], 0);
-  const expectedHours =
-    (dayCount - offdaysCount - holidaysInWorkdays) * hoursOnWorkdays + holidaysInWorkdays * hoursOnHolidays;
+  const expectedWorkedDays = dayCount - offdaysCount - holidaysInWorkdays;
+  const expectedHours = expectedWorkedDays * hoursOnWorkdays + holidaysInWorkdays * hoursOnHolidays;
   return actualHours - expectedHours + referenceBalance;
 }
 
