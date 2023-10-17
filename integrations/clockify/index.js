@@ -1,32 +1,9 @@
-import { setupFilesInHomeAndPromptForInfo, getConfig, parseHHMM } from './utils.js';
+import { setupFilesInHomeAndPromptForInfo, getConfig  } from './utils.js';
 import axios from 'axios';
 import * as dates from '../../core/dates.js';
 
 export async function beforeRun() {
   await setupFilesInHomeAndPromptForInfo();
-}
-
-function isodateToDate(isoDate) {
-  let [year, month, day] = isoDate.split('-').map((x) => parseInt(x));
-  return new Date(year, month - 1, day);
-}
-
-export function getReferenceDate() {
-  const config = getConfig();
-  if (config.referenceDate == null) {
-    throw new Error('Improper configuration of config');
-  }
-
-  return isodateToDate(config.referenceDate);
-}
-
-export function getReferenceBalance() {
-  const config = getConfig();
-  if (config.referenceBalance == null) {
-    throw new Error('Improper configuration of config');
-  }
-
-  return parseHHMM(config.referenceBalance);
 }
 
 /**
@@ -43,9 +20,7 @@ export async function getWorkHours(from, to) {
   const workspaceId = config.workspaceId;
 
   const startDate = dates.dateToISODatetimeWithoutOffset(dates.offsetDate(from));
-  const endDate = dates.dateToISODatetimeWithoutOffset(
-    dates.offsetDate(to, { days: 1, seconds: -1 })
-  );
+  const endDate = dates.dateToISODatetimeWithoutOffset(dates.offsetDate(to, { days: 1, seconds: -1 }));
 
   /** @type {ClockifyDashboardInfoResponse} */
   let result;
@@ -74,24 +49,6 @@ export async function getWorkHours(from, to) {
   const { hours, minutes } = dates.parseISODuration(result.totalTime);
   const workHours = hours + minutes / 60;
   return workHours;
-}
-
-export function getExpectedRegisteredHoursOnWorkdays() {
-  const config = getConfig();
-  if (!config.expectedRegisteredHoursOnWorkdays == null) {
-    throw new Error('Improper configuration of config');
-  }
-
-  return parseHHMM(config.expectedRegisteredHoursOnWorkdays);
-}
-
-export function getExpectedRegisteredHoursOnHolidays() {
-  const config = getConfig();
-  if (config.expectedRegisteredHoursOnHolidays == null) {
-    throw new Error('Improper configuration of config');
-  }
-
-  return parseHHMM(config.expectedRegisteredHoursOnHolidays);
 }
 
 /**

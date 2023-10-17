@@ -6,10 +6,6 @@ import axios from 'axios';
 /**
  * @typedef {Object} ClockifyConfig
  * @property {string} apiKey - The API key.
- * @property {string} referenceDate - The reference date in YYYY-MM-DD format.
- * @property {string} referenceBalance - The reference balance in HH:MM format.
- * @property {string} expectedRegisteredHoursOnWorkdays - The expected registered hours on workdays in HH:MM format.
- * @property {string} expectedRegisteredHoursOnHolidays - The expected registered hours on holidays in HH:MM format.
  * @property {string} userId - The user ID.
  * @property {string} workspaceId - The workspace ID.
  */
@@ -28,30 +24,6 @@ export async function setupFilesInHomeAndPromptForInfo() {
       name: 'apiKey',
       message: 'Go to https://app.clockify.me/user/settings and obtain an api key and paste it here:',
       validate: (input) => input.length > 0,
-    },
-    {
-      type: 'input',
-      name: 'referenceDate',
-      message: 'Enter reference date (YYYY-mm-dd):',
-      validate: (input) => input.length > 0,
-    },
-    {
-      type: 'input',
-      name: 'referenceBalance',
-      message: 'Enter reference balance (HH:mm):',
-      default: '00:00',
-    },
-    {
-      type: 'input',
-      name: 'expectedRegisteredHoursOnWorkdays',
-      message: 'Enter length of a regular workday (HH:mm):',
-      default: '07:30',
-    },
-    {
-      type: 'input',
-      name: 'expectedRegisteredHoursOnHolidays',
-      message: 'Enter expected hours registered on a holiday (HH:mm):',
-      default: '00:00',
     },
   ]);
 
@@ -100,19 +72,4 @@ export function getConfig() {
   }
   config = JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
   return config;
-}
-
-const hhmmRegex = /^(\d+):(\d+)$/;
-
-/**
- * @param {string} hhmm - string in HH:MM format, can also be like 1234:456
- * @returns {number}
- */
-export function parseHHMM(hhmm) {
-  if (!hhmmRegex.test(hhmm)) {
-    throw new Error(`Invalid HH:MM string: ${hhmm}`);
-  }
-
-  const [hoursString, minutesString] = hhmm.split(':');
-  return parseInt(hoursString) + parseInt(minutesString) / 60;
 }
