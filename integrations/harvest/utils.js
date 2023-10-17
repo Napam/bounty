@@ -2,6 +2,7 @@ import fs from 'fs';
 import axios from 'axios';
 import readline from 'readline';
 import { CONFIG_FILE } from './constants.js';
+import { NorwegianHoliday } from '../../core/holidays.js';
 
 /**
  * @typedef {Object} HarvestConfig

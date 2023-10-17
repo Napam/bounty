@@ -74,10 +74,10 @@ export function getNorwegianHolidays(year) {
     [NorwegianHoliday.NEW_YEAR]: new Date(year, 0, 1),
     [NorwegianHoliday.WORKERS_DAY]: new Date(year, 4, 1),
     [NorwegianHoliday.INDEPENDENCE_DAY]: new Date(year, 4, 17),
-    [NorwegianHoliday.CHRISTMAS_EVE]: new Date(year, 11, 24), // Julaften, not necessarily for all workplaces
-    [NorwegianHoliday.CHRISTMAS_DAY]: new Date(year, 11, 25), // Forste juledag
-    [NorwegianHoliday.BOXING_DAY]: new Date(year, 11, 26), // Andre jule dag
-    [NorwegianHoliday.NEW_YEARS_EVE]: new Date(year, 11, 31), // New year, not necessarily for all workplaces
+    [NorwegianHoliday.CHRISTMAS_EVE]: new Date(year, 11, 24),
+    [NorwegianHoliday.CHRISTMAS_DAY]: new Date(year, 11, 25),
+    [NorwegianHoliday.BOXING_DAY]: new Date(year, 11, 26),
+    [NorwegianHoliday.NEW_YEARS_EVE]: new Date(year, 11, 31),
   };
   return { ...easterDates, ...fixedHolidays };
 }
