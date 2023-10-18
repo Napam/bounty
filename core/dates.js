@@ -206,20 +206,27 @@ export function ISOToMs(isodate) {
 
 /**
  * Turn Javascript date into YYYY-MM-DDTHH:MM:SSZ format with "zeroed" timezone offset
- * E.g. 2020-12-13T12:43:23Z becomes 2020-12-13T00:00:00Z
+ * Say you are in Norway at the datetime 2023-10-11T00:00:00.000+02:00, then in
+ * Node will display 2023-10-10T22:00:00.000Z. This function will turn it back to
+ * 2023-10-11T00:00:00.000Z as a string such the date part matches the local time
  * @param {Date} date
+ * @returns {string} ISO datetime string
  */
 export function dateToISODatetimeWithoutOffset(date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
 }
 
 /**
- * Turn Javascript date into YYYY-MM-DD, will zero out offset
- * E.g. a Date object of 2023-08-13T22:00:00.000Z will become 2023-08-14 in Norway
+ * Turn Javascript date into YYYY-MM-DDTHH:MM:SSZ format with "zeroed" timezone offset
+ * Say you are in Norway at the datetime 2023-10-11T00:00:00.000+02:00, then in
+ * Node will display 2023-10-10T22:00:00.000Z. This function will turn it back to
+ * 2023-10-11T00:00:00.000Z as a string such the date part matches the local time and then
+ * remove the time part.
  * @param {Date} date
+ * @returns {string} ISO datetime string
  */
-export function dateToISODate(date) {
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+export function dateToISODateWithoutOffset(date) {
+  return dateToISODatetimeWithoutOffset(date).split('T')[0];
 }
 
 const ISODurationPattern =
@@ -243,6 +250,18 @@ export function parseISODuration(durationString) {
     minutes: parseInt(minutes ?? '0'),
     seconds: parseInt(seconds ?? '0'),
   };
+}
+
+export const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Parses ISO date string to a Date object
+ * @param {string} isoDate - E.g. 2021-12-31
+ * @return {Date} A date object representing the ISO date.
+ */
+export function ISODateToDate(isoDate) {
+  if (!isoDateRegex.test(isoDate)) throw new Error(`Invalid ISO date string: ${isoDate}`);
+  return new Date(isoDate);
 }
 
 /**

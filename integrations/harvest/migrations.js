@@ -16,7 +16,7 @@ import readline from 'readline';
 
 export default [
   /**
-   * Initial migration
+   * Initial migration (should be ran on first bounty harvest run)
    */
   async function initBountyConfig(config) {
     const objectIsEmpty = (object) => Object.keys(object).length === 0;
@@ -36,23 +36,24 @@ export default [
     console.log('Press "Create new personal access token" if you dont have one');
     const token = await question('Copy and paste your token here: ');
     const accountId = await question('Copy and paste Account ID here: ');
-    const referenceDate = await question('Enter reference date (YYYY-MM-DD): ');
-    const referenceBalance = await question('Enter reference flextime balance (float): ');
     rl.close();
 
     console.log('Got token:', token);
     console.log('Got Account Id:', accountId);
     return {
+      version: '1',
       headers: {
         'Harvest-Account-ID': accountId,
         Authorization: 'Bearer ' + token,
       },
-      referenceDate: referenceDate,
-      referenceBalance: parseFloat(referenceBalance),
     };
   },
 
   /**
+   * This migration is now partly deprecated as most of what it did before
+   * is now unused
+   *
+   * Old migration logic:
    * Add version, expectedWorkHoursPerDay and entriesToIgnore
    * @param {object} config
    */
@@ -61,26 +62,17 @@ export default [
       return config;
     }
 
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const question = (string) => new Promise((resolve) => rl.question(string, resolve));
-    const expectedWorkHoursPerDay = await question(
-      'Enter expected registered hours per day (float, default 7.5): '
-    );
-    rl.close();
     return {
       version: '2',
-      headers: {
-        'Harvest-Account-ID': config.headers['Harvest-Account-ID'],
-        Authorization: config.headers['Authorization'],
-      },
-      referenceDate: config.referenceDate,
-      referenceBalance: config.referenceBalance,
-      expectedWorkHoursPerDay: expectedWorkHoursPerDay.length ? parseFloat(expectedWorkHoursPerDay) : 7.5,
+      ...config,
       entriesToIgnore: [{ project: 'Absence', task: 'Time off' }],
     };
   },
 
   /**
+   * This migration is now deprecated as what it did before is now unused
+   *
+   * Old migration logic:
    * Rename expectedWorkHoursPerDay to expectedRegisteredHoursOnWorkdays
    * Add expectedRegisteredHoursOnHolidays
    * @param {object} config
@@ -90,23 +82,24 @@ export default [
       return config;
     }
 
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const question = (string) => new Promise((resolve) => rl.question(string, resolve));
-    const expectedRegisteredHoursOnHolidays = await question(
-      'Enter expected registered hours on holidays (float, default 7.5): '
-    );
-    rl.close();
+    return { ...config };
+  },
 
-    const newConfig = {
-      ...config,
-      version: '3',
-      expectedRegisteredHoursOnWorkdays: config.expectedWorkHoursPerDay,
-      expectedRegisteredHoursOnHolidays: expectedRegisteredHoursOnHolidays.length
-        ? parseFloat(expectedRegisteredHoursOnHolidays)
-        : 7.5,
+  /**
+   * Migration function that is used for clearing up after refactoring
+   * referenceBalance, referenceDate, expectedRegisteredHoursOnWorkdays and
+   * expectedRegisteredHoursOnHolidays to core bounty config
+   * @param {object} config
+   */
+  async function migrate4(config) {
+    if (parseInt(config.version) >= 4) {
+      return config;
+    }
+
+    return {
+      version: config.version,
+      headers: config.headers,
+      entriesToIgnore: config.entriesToIgnore,
     };
-
-    delete newConfig.expectedWorkHoursPerDay;
-    return newConfig;
   },
 ];

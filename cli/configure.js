@@ -3,22 +3,12 @@ import { BOUNTY_CONFIG_DIR, BOUNTY_CORE_CONFIG_FILE } from '../core/constants.js
 import { CONFIG_FILE as HARVEST_CONFIG_FILE } from '../integrations/harvest/constants.js';
 import inquirer from 'inquirer';
 import { NorwegianHoliday } from '../core/holidays.js';
+import { ISODateToDate, isoDateRegex } from '../core/dates.js';
+import * as yup from 'yup';
 
 /**
- * Returns null if the config file does not exist
- * @param
- * @returns {BountyConfig | null} Bounty configuration
- */
-export function getConfig() {
-  if (!fs.existsSync(BOUNTY_CORE_CONFIG_FILE)) {
-    return null;
-  }
-  return JSON.parse(fs.readFileSync(BOUNTY_CORE_CONFIG_FILE).toString());
-}
-
-/**
- * Core Bounty config file
- * @typedef {Object} BountyConfig
+ * Core Bounty config file that is unprocessed / parsed
+ * @typedef {Object} RawBountyConfig
  * @property {string} version
  * @property {'harvest' | 'clockify'} integration
  * @property {number} hoursOnWorkdays - Expected registered hours on workdays
@@ -29,7 +19,19 @@ export function getConfig() {
  */
 
 /**
- * The harvest config format at the of refactring config files into core bounty config and integration configs
+ * Core Bounty config file
+ * @typedef {Object} BountyConfig
+ * @property {string} version
+ * @property {'harvest' | 'clockify'} integration
+ * @property {number} hoursOnWorkdays - Expected registered hours on workdays
+ * @property {number} hoursOnHolidays - Expected registered hours on holidays
+ * @property {Date} referenceDate - this is a date where you know what your flex balance was
+ * @property {number} referenceBalance - Your flex balance at the reference date
+ * @property {Record<string, number>} hoursOnSpecificHolidays - Map that maps a string to a number, where the string is the name of a holiday and the number is the expected registered hours
+ */
+
+/**
+ * The old harvest config format at the of refactoring config files into core bounty config and integration configs
  *
  * @typedef {Object} OldHarvestConfig
  * @property {string} version - The version of the data.
@@ -44,6 +46,78 @@ export function getConfig() {
  * @property {number} expectedRegisteredHoursOnWorkdays - The expected registered hours on workdays.
  * @property {number} expectedRegisteredHoursOnHolidays - The expected registered hours on holidays.
  */
+
+const configSchema = yup.object().shape({
+  version: yup.string().required(),
+  integration: yup.string().oneOf(['harvest', 'clockify']).required(),
+  hoursOnWorkdays: yup.number().required(),
+  hoursOnHolidays: yup.number().required(),
+  referenceDate: yup.string().required(),
+  referenceBalance: yup.number().required(),
+  hoursOnSpecificHolidays: yup
+    .object()
+    .nullable()
+    .test(
+      'valid-holidays',
+      'Config object has invalid holiday in hoursOnSpecificHolidays, see docs for valid holidays',
+      (value) => {
+        if (!value) {
+          return true;
+        }
+        const validHolidays = Object.values(NorwegianHoliday);
+        return Object.keys(value).every((holiday) => validHolidays.includes(holiday));
+      }
+    )
+    .test(
+      'valid-hours',
+      'Config object has non-numeric value for holiday in hoursOnSpecificHolidays, should be a number',
+      (value) => {
+        if (!value) {
+          return true;
+        }
+        return Object.values(value).every((hours) => typeof hours === 'number');
+      }
+    ),
+});
+
+/**
+ * @param {RawBountyConfig} config
+ * @returns {BountyConfig}
+ */
+function validateAndProcessBountyConfig(config) {
+  try {
+    const validatedConfig = configSchema.validateSync(config);
+    validatedConfig.referenceDate = ISODateToDate(config.referenceDate);
+    return validatedConfig;
+  } catch (error) {
+    console.error(
+      `\x1b[31mError while processing config file \x1b[33m${BOUNTY_CORE_CONFIG_FILE}\x1b[m:\n${error}`
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Returns null if the config file does not exist
+ * @param
+ * @returns {RawBountyConfig | null} Bounty configuration
+ */
+export function getConfig() {
+  if (!fs.existsSync(BOUNTY_CORE_CONFIG_FILE)) {
+    return null;
+  }
+  return JSON.parse(fs.readFileSync(BOUNTY_CORE_CONFIG_FILE).toString());
+}
+
+/**
+ * @param {string} input
+ */
+function validateNumber(input) {
+  if (isNaN(parseFloat(input))) {
+    return 'Must be valid number';
+  }
+  return true;
+}
 
 /**
  * At the beginning there was only the harvest integration. It had it's config in ~/.bounty/config.json,
@@ -62,12 +136,12 @@ export async function initalizeBountyConfig() {
   let oldHarvestConfig = null;
 
   if (config != null && !isOldHarvestConfig) {
-    return config;
+    return validateAndProcessBountyConfig(config);
   }
 
   if (isOldHarvestConfig) {
     console.log(
-      `Found old harvest config file at ${BOUNTY_CORE_CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}`
+      `Detected old harvest config file at ${BOUNTY_CORE_CONFIG_FILE}, moving it to the new location: ${HARVEST_CONFIG_FILE}`
     );
     fs.copyFileSync(BOUNTY_CORE_CONFIG_FILE, HARVEST_CONFIG_FILE);
     oldHarvestConfig = config;
@@ -95,6 +169,12 @@ export async function initalizeBountyConfig() {
       type: 'input',
       name: 'referenceDate',
       message: 'Enter reference date (YYYY-MM-DD):',
+      validate(input) {
+        if (!isoDateRegex.test(input)) {
+          return 'Invalid date format. Please enter a date in the format YYYY-MM-DD.';
+        }
+        return true;
+      },
     });
 
     config.referenceDate = referenceDate;
@@ -108,6 +188,7 @@ export async function initalizeBountyConfig() {
       type: 'input',
       name: 'referenceBalance',
       message: 'Enter reference flextime balance (float):',
+      validate: validateNumber,
     });
 
     config.referenceBalance = parseFloat(referenceBalance);
@@ -120,11 +201,13 @@ export async function initalizeBountyConfig() {
   }
 
   if (!oldHarvestConfig?.expectedRegisteredHoursOnWorkdays) {
+    const defaultHoursOnWorkdays = 7.5;
     const { hoursOnWorkdays } = await inquirer.prompt({
       type: 'input',
       name: 'hoursOnWorkdays',
-      message: 'Enter expected registered hours per day (float, default 7.5):',
-      default: 7.5,
+      message: `Enter expected registered hours per day (float, default ${defaultHoursOnWorkdays}):`,
+      default: defaultHoursOnWorkdays,
+      validate: validateNumber,
     });
 
     config.hoursOnWorkdays = hoursOnWorkdays;
@@ -137,11 +220,13 @@ export async function initalizeBountyConfig() {
   }
 
   if (!oldHarvestConfig?.expectedRegisteredHoursOnHolidays) {
+    const defaultHoursOnHolidays = 7.5;
     const { hoursOnHolidays } = await inquirer.prompt({
       type: 'input',
       name: 'hoursOnHolidays',
-      message: 'Enter expected registered hours on holidays (float, default 7.5):',
-      default: 7.5,
+      message: `Enter expected registered hours on holidays (float, default ${defaultHoursOnHolidays}):`,
+      default: defaultHoursOnHolidays,
+      validate: validateNumber,
     });
 
     config.hoursOnHolidays = hoursOnHolidays;
@@ -153,20 +238,22 @@ export async function initalizeBountyConfig() {
     config.hoursOnHolidays = oldHarvestConfig.expectedRegisteredHoursOnHolidays;
   }
 
+  const defaultHoursOnHolyWednesday = 3.75;
   const { hoursOnHolyWednesday } = await inquirer.prompt({
     type: 'input',
     name: 'hoursOnHolyWednesday',
-    message:
-      'Enter expected registered hours on Holy Wednesday (onsdagen før Skjærtorsdag) (float, default 3.75):',
-    default: 3.75,
+    message: `Enter expected registered hours on Holy Wednesday (onsdagen før Skjærtorsdag) (float, default ${defaultHoursOnHolyWednesday}):`,
+    default: defaultHoursOnHolyWednesday,
+    validate: validateNumber,
   });
 
+  const defualtHoursOnChristmasEve = 3.75;
   const { hoursOnChristmasEve } = await inquirer.prompt({
     type: 'input',
     name: 'hoursOnChristmasEve',
-    message:
-      'Enter expected registered hours on Christmas Eve (Julaften, 24. December) (float, default 3.75):',
-    default: 3.75,
+    message: `Enter expected registered hours on Christmas Eve (Julaften, 24. December) (float, default ${defualtHoursOnChristmasEve}):`,
+    default: defualtHoursOnChristmasEve,
+    validate: validateNumber,
   });
 
   config.hoursOnSpecificHolidays = {
@@ -174,6 +261,7 @@ export async function initalizeBountyConfig() {
     [NorwegianHoliday.CHRISTMAS_EVE]: hoursOnChristmasEve,
   };
 
+  const validatedconfig = validateAndProcessBountyConfig(config);
   fs.writeFileSync(BOUNTY_CORE_CONFIG_FILE, JSON.stringify(config, null, 2));
-  return config;
+  return validatedconfig;
 }

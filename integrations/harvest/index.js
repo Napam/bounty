@@ -1,35 +1,12 @@
 import * as dates from '../../core/dates.js';
-import { setupFilesInHomeAndPromptForInfo, getConfig, timeEntryGenerator } from './utils.js';
-
-export async function beforeRun() {
-  await setupFilesInHomeAndPromptForInfo();
-}
-
-function isodateToDate(isoDate) {
-  let [year, month, day] = isoDate.split('-').map((x) => parseInt(x));
-  return new Date(year, month - 1, day);
-}
-
-export function getReferenceDate() {
-  const config = getConfig();
-  if (config.referenceDate) return isodateToDate(config.referenceDate);
-
-  throw new Error('Improper configuration of config');
-}
-
-export function getReferenceBalance() {
-  const config = getConfig();
-  if (config.referenceBalance != null) return config.referenceBalance;
-
-  throw new Error('Improper configuration of config');
-}
+import { setupFilesInHomeAndPromptForInfo, timeEntryGenerator } from './utils.js';
 
 /**
  * @param {Date} from
  * @param {Date} to
  */
 export async function getWorkHours(from, to) {
-  const config = getConfig();
+  const config = await setupFilesInHomeAndPromptForInfo();
 
   const zeroIfShouldIgnore = (timeEntry) => {
     for (const { project: projectName, task: taskName } of config.entriesToIgnore) {
@@ -43,23 +20,13 @@ export async function getWorkHours(from, to) {
   let hours = 0;
   for await (let timeEntry of timeEntryGenerator(
     config.headers,
-    dates.dateToISODate(from),
-    dates.dateToISODate(to)
+    dates.dateToISODateWithoutOffset(from),
+    dates.dateToISODateWithoutOffset(to)
   )) {
     hours += zeroIfShouldIgnore(timeEntry) * timeEntry.hours;
   }
 
   return hours;
-}
-
-export function getExpectedRegisteredHoursOnWorkdays() {
-  const config = getConfig();
-  return config.expectedRegisteredHoursOnWorkdays;
-}
-
-export function getExpectedRegisteredHoursOnHolidays() {
-  const config = getConfig();
-  return config.expectedRegisteredHoursOnHolidays;
 }
 
 /**

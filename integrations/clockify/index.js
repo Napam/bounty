@@ -1,10 +1,6 @@
-import { setupFilesInHomeAndPromptForInfo, getConfig  } from './utils.js';
+import { setupFilesInHomeAndPromptForInfo } from './utils.js';
 import axios from 'axios';
 import * as dates from '../../core/dates.js';
-
-export async function beforeRun() {
-  await setupFilesInHomeAndPromptForInfo();
-}
 
 /**
  * @typedef {Object} ClockifyDashboardInfoResponse
@@ -16,7 +12,7 @@ export async function beforeRun() {
  * @param {Date} to
  */
 export async function getWorkHours(from, to) {
-  const config = getConfig();
+  const config = await setupFilesInHomeAndPromptForInfo();
   const workspaceId = config.workspaceId;
 
   const startDate = dates.dateToISODatetimeWithoutOffset(dates.offsetDate(from));

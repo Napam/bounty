@@ -15,7 +15,7 @@ import axios from 'axios';
  */
 export async function setupFilesInHomeAndPromptForInfo() {
   if (fs.existsSync(CONFIG_FILE)) {
-    return;
+    return getConfig();
   }
 
   const config = await inquirer.prompt([
@@ -58,8 +58,8 @@ export async function setupFilesInHomeAndPromptForInfo() {
   }
 
   config.version = '1';
-
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+  return config;
 }
 
 /** @type {ClockifyConfig | null} */

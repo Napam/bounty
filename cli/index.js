@@ -7,10 +7,7 @@ import { initalizeBountyConfig } from './configure.js';
 /**
  * Integration module
  * @typedef {Object} Integration
- * @property {() => Promise<void> | void} beforeRun
  * @property {(from: Date, to: Date) => Promise<number> | number} getWorkHours
- * @property {() => Promise<Date> | Date} getReferenceDate
- * @property {() => Promise<number> | number} getReferenceBalance
  * @property {(from: Date, to: Date, balance: number) => Promise<void> | void} afterRun
  */
 
@@ -35,17 +32,12 @@ function incrementDateIfBeforeToday(date) {
 
 async function run() {
   const bountyConfig = await initalizeBountyConfig();
-  const { beforeRun, getWorkHours, getReferenceDate, getReferenceBalance, afterRun } =
-    await getIntegration(bountyConfig);
+  const { getWorkHours, afterRun } = await getIntegration(bountyConfig);
 
-  await beforeRun();
-  const from = incrementDateIfBeforeToday(await getReferenceDate());
+  const from = incrementDateIfBeforeToday(bountyConfig.referenceDate);
   const to = getTodayDate();
   const workedHours = await getWorkHours(from, to);
-  const referenceBalance = await getReferenceBalance();
-  const hoursOnWorkdays = bountyConfig.hoursOnWorkdays;
-  const hoursOnHolidays = bountyConfig.hoursOnHolidays;
-  const hoursOnSpecificHolidays = bountyConfig.hoursOnSpecificHolidays;
+  const { referenceBalance, hoursOnWorkdays, hoursOnHolidays, hoursOnSpecificHolidays } = bountyConfig;
   const balance = calcFlexBalance(workedHours, from, referenceBalance, {
     to,
     hoursOnWorkdays,
