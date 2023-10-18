@@ -3,8 +3,22 @@ import axios from 'axios';
 import * as dates from '../../core/dates.js';
 
 /**
+ * @typedef {Object} ProjectAndTotalTime
+ * @property {string} projectName - The name of the project.
+ * @property {string} label - Arbitrary label, usually name of project
+ * @property {string} clientName - Client name
+ * @property {string} percentage - Percentage spent relative to everything else in the time span
+ * @property {string} color - Hex color in Clockify dashboard
+ * @property {number} earned - Earned
+ * @property {string} billableDuration - Format of PT(?<hours>\d+)H(?<minutes>\d+)M
+ * @property {string} duration - The total time spent on the project in format of PT(?<hours>\d+)H(?<minutes>\d+)M
+ */
+
+/**
  * @typedef {Object} ClockifyDashboardInfoResponse
  * @property {string} totalTime - Total time in the format of PT(?<hours>\d+)H(?<minutes>\d+)M.
+ * @property {Record<string, ProjectAndTotalTime>} projectAndTotalTime - An object containing the name and total time spent on each project.
+ * @property {Record<string, ProjectAndTotalTime>} dateAndtotalTime - An object containing the name and total time spent on each project. Keys are iso dates.
  */
 
 /**
@@ -40,6 +54,10 @@ export async function getWorkHours(from, to) {
   } catch (error) {
     console.error('Could not get data from clockify:', error);
     process.exit();
+  }
+
+  for (const [_, entry] of Object.entries(result.projectAndTotalTime)) {
+    // console.log(entry.projectName);
   }
 
   const { hours, minutes } = dates.parseISODuration(result.totalTime);
