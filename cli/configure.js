@@ -84,9 +84,9 @@ const configSchema = yup.object().shape({
  * @param {RawBountyConfig} config
  * @returns {BountyConfig}
  */
-function validateAndProcessBountyConfig(config) {
+export function validateAndProcessBountyConfig(config) {
   try {
-    const validatedConfig = configSchema.validateSync(config);
+    const validatedConfig = { ...configSchema.validateSync(config) };
     validatedConfig.referenceDate = ISODateToDate(config.referenceDate);
     return validatedConfig;
   } catch (error) {
@@ -130,7 +130,7 @@ function validateNumber(input) {
  */
 export async function initalizeBountyConfig() {
   let config = getConfig();
-  let isOldHarvestConfig = config != null && !Boolean(config.integration);
+  let isOldHarvestConfig = config != null && !config.integration;
 
   /** @type {OldHarvestConfig | null} */
   let oldHarvestConfig = null;
@@ -247,18 +247,18 @@ export async function initalizeBountyConfig() {
     validate: validateNumber,
   });
 
-  const defualtHoursOnChristmasEve = 3.75;
+  const defaultHoursOnChristmasEve = 3.75;
   const { hoursOnChristmasEve } = await inquirer.prompt({
     type: 'input',
     name: 'hoursOnChristmasEve',
-    message: `Enter expected registered hours on Christmas Eve (Julaften, 24. December) (float, default ${defualtHoursOnChristmasEve}):`,
-    default: defualtHoursOnChristmasEve,
+    message: `Enter expected registered hours on Christmas Eve (Julaften, 24. December) (float, default ${defaultHoursOnChristmasEve}):`,
+    default: defaultHoursOnChristmasEve,
     validate: validateNumber,
   });
 
   config.hoursOnSpecificHolidays = {
-    [NorwegianHoliday.HOLY_WEDNESDAY]: hoursOnHolyWednesday,
-    [NorwegianHoliday.CHRISTMAS_EVE]: hoursOnChristmasEve,
+    [NorwegianHoliday.HOLY_WEDNESDAY]: parseFloat(hoursOnHolyWednesday),
+    [NorwegianHoliday.CHRISTMAS_EVE]: parseFloat(hoursOnChristmasEve),
   };
 
   const validatedconfig = validateAndProcessBountyConfig(config);

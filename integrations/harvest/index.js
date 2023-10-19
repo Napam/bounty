@@ -1,5 +1,8 @@
 import * as dates from '../../core/dates.js';
 import { setupFilesInHomeAndPromptForInfo } from './configuration.js';
+import { CONFIG_FILE } from './constants.js';
+import axios from 'axios';
+import { getConfig as getCoreConfig, validateAndProcessBountyConfig } from '../../cli/configure.js';
 
 /**
  * @param {object} headers headers to send to harvest
@@ -52,19 +55,10 @@ export async function getWorkHours(from, to) {
  * @param {{to: Date, from: Date , balance: number}} obj
  * */
 export async function afterRun({ balance }) {
-  console.log('referenceDate :>> ', getReferenceDate().toLocaleDateString('no-NB'));
-  console.log('referenceBalance :>> ', getReferenceBalance());
+  const coreConfig = validateAndProcessBountyConfig(getCoreConfig());
+
+  console.log('referenceDate :>> ', coreConfig.toLocaleDateString('no-NB'));
+  console.log('referenceBalance :>> ', coreConfig.referenceBalance);
   console.log('currDate :>> ', new Date().toLocaleDateString('no-NB'));
   console.log('currBalance :>> ', balance);
-}
-
-import { fileURLToPath } from 'url';
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  async function main() {
-    await beforeRun();
-    const workedHours = await getWorkHours();
-    console.log('workedHours :>> ', workedHours);
-  }
-
-  main();
 }

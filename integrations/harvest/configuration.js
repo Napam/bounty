@@ -34,7 +34,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
 
   setConfig(currConfig);
   console.log();
-  console.log(`Config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${CONFIG_FILE}\x1b[m`);
+  console.log(`Harvest config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${CONFIG_FILE}\x1b[m`);
   console.log();
   console.log(`If something crashes, make sure that the config values makes sense:`);
   console.log(currConfig);
@@ -43,11 +43,18 @@ export async function setupFilesInHomeAndPromptForInfo() {
   return currConfig;
 }
 
+/** @type {ClockifyConfig | null} */
+let config = null;
+
 /**
  * @returns {HarvestConfig}
  */
 export function getConfig() {
-  return JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
+  if (config != null) {
+    return config;
+  }
+  config = JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
+  return config;
 }
 
 export function setConfig(config) {
