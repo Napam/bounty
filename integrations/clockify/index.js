@@ -1,11 +1,16 @@
-import { setupFilesInHomeAndPromptForInfo } from './utils.js';
+import { setupFilesInHomeAndPromptForInfo } from './configuration.js';
 import axios from 'axios';
 import * as dates from '../../core/dates.js';
 
 /**
+ * @typedef {import('./configuration.js').ClockifyConfig} ClockifyConfig
+ * @typedef {import('./configuration.js').IgnoreEntryFilter} IgnoreEntryFilter
+ */
+
+/**
  * @typedef {Object} ProjectAndTotalTime
  * @property {string} projectName - The name of the project.
- * @property {string} label - Arbitrary label, usually name of project
+ * @property {string} label - Arbitrary label, seemingly name of project by default
  * @property {string} clientName - Client name
  * @property {string} percentage - Percentage spent relative to everything else in the time span
  * @property {string} color - Hex color in Clockify dashboard
@@ -17,8 +22,8 @@ import * as dates from '../../core/dates.js';
 /**
  * @typedef {Object} ClockifyDashboardInfoResponse
  * @property {string} totalTime - Total time in the format of PT(?<hours>\d+)H(?<minutes>\d+)M.
- * @property {Record<string, ProjectAndTotalTime>} projectAndTotalTime - An object containing the name and total time spent on each project.
- * @property {Record<string, ProjectAndTotalTime>} dateAndtotalTime - An object containing the name and total time spent on each project. Keys are iso dates.
+ * @property {Record<string, ProjectAndTotalTime>} projectAndTotalTime - An object containing the name and total time spent on each project. Keys are IDs.
+ * @property {Record<string, ProjectAndTotalTime>} dateAndtotalTime - An object containing the name and total time spent on each project. Keys are ISO dates.
  */
 
 /**
@@ -56,13 +61,30 @@ export async function getWorkHours(from, to) {
     process.exit();
   }
 
-  for (const [_, entry] of Object.entries(result.projectAndTotalTime)) {
-    // console.log(entry.projectName);
+  let hoursToIgnore = 0;
+  for (const entry of Object.values(result.projectAndTotalTime)) {
+    for (const filters of config.entriesToIgnore) {
+      const shouldIgnore = determineIfShouldIgnore(filters, entry);
+      hoursToIgnore += shouldIgnore * dates.ISODurationSubsetToHours(entry.duration);
+    }
   }
 
   const { hours, minutes } = dates.parseISODuration(result.totalTime);
   const workHours = hours + minutes / 60;
-  return workHours;
+  return Math.max(workHours - hoursToIgnore, 0);
+}
+
+/**
+ * @param {IgnoreEntryFilter[]} filters
+ * @param {ProjectAndTotalTime} entry
+ */
+function determineIfShouldIgnore(filters, entry) {
+  for (const [keyToIgnore, valueToIgnore] of Object.entries(filters)) {
+    if (!(entry[keyToIgnore] === valueToIgnore)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**

@@ -75,7 +75,7 @@ const configSchema = yup.object().shape({
         if (!value) {
           return true;
         }
-        return Object.values(value).every((hours) => typeof hours === 'number');
+        return Object.values(value).every((hours) => !isNaN(parseFloat(hours)));
       }
     ),
 });

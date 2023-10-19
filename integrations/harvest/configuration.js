@@ -1,5 +1,4 @@
 import fs from 'fs';
-import axios from 'axios';
 import readline from 'readline';
 import { CONFIG_FILE } from './constants.js';
 
@@ -53,23 +52,4 @@ export function getConfig() {
 
 export function setConfig(config) {
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 4));
-}
-
-/**
- * @param {object} headers headers to send to harvest
- * @param {string} from string of YYYY-MM-DD
- * @param {string} to string of YYYY-MM-DD
- */
-export async function* timeEntryGenerator(headers, from, to) {
-  try {
-    const get = async (url, params) => (await axios.get(url, { headers, params })).data;
-    let res = await get('https://api.harvestapp.com/v2/time_entries', { from, to });
-    do for (let timeEntry of res.time_entries) yield timeEntry;
-    while (res.links.next && (res = await get(res.links.next)));
-  } catch (error) {
-    console.log(`\x1b[31mAn error occured when attempting to get data from Harvest\x1b[0m`);
-    console.log('Attempt to display axios error:', error?.response?.data);
-    console.log(`Are the values in \x1b[33m${CONFIG_FILE}\x1b[0m correct?`);
-    process.exit();
-  }
 }

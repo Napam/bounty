@@ -4,10 +4,18 @@ import inquirer from 'inquirer';
 import axios from 'axios';
 
 /**
+ * @typedef {Object} IgnoreEntryFilter
+ * @property {string} projectName
+ * @property {string} clientName
+ * @property {string} label
+ */
+
+/**
  * @typedef {Object} ClockifyConfig
  * @property {string} apiKey - The API key.
  * @property {string} userId - The user ID.
  * @property {string} workspaceId - The workspace ID.
+ * @property {IgnoreEntryFilter[]} entriesToIgnore - Entries that are to be ignored, e.g. vacation entries
  */
 
 /**
@@ -18,7 +26,9 @@ export async function setupFilesInHomeAndPromptForInfo() {
     return getConfig();
   }
 
-  const config = await inquirer.prompt([
+  const config = { version: '1' };
+
+  const { apiKey } = await inquirer.prompt([
     {
       type: 'input',
       name: 'apiKey',
@@ -26,6 +36,8 @@ export async function setupFilesInHomeAndPromptForInfo() {
       validate: (input) => input.length > 0,
     },
   ]);
+
+  config.apiKey = apiKey;
 
   try {
     const response = await axios.get('https://api.clockify.me/api/v1/user', {
@@ -57,7 +69,8 @@ export async function setupFilesInHomeAndPromptForInfo() {
     process.exit();
   }
 
-  config.version = '1';
+  config.entriesToIgnore = [];
+
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
   return config;
 }

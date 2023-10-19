@@ -229,6 +229,18 @@ export function dateToISODateWithoutOffset(date) {
   return dateToISODatetimeWithoutOffset(date).split('T')[0];
 }
 
+export const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Parses ISO date string to a Date object
+ * @param {string} isoDate - E.g. 2021-12-31
+ * @return {Date} A date object representing the ISO date.
+ */
+export function ISODateToDate(isoDate) {
+  if (!isoDateRegex.test(isoDate)) throw new Error(`Invalid ISO date string: ${isoDate}`);
+  return new Date(isoDate);
+}
+
 const ISODurationPattern =
   /P((?<years>\d+)Y)?((?<months>\d+)M)?((?<days>\d+)D)?T((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/;
 
@@ -252,18 +264,6 @@ export function parseISODuration(durationString) {
   };
 }
 
-export const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
-
-/**
- * Parses ISO date string to a Date object
- * @param {string} isoDate - E.g. 2021-12-31
- * @return {Date} A date object representing the ISO date.
- */
-export function ISODateToDate(isoDate) {
-  if (!isoDateRegex.test(isoDate)) throw new Error(`Invalid ISO date string: ${isoDate}`);
-  return new Date(isoDate);
-}
-
 /**
  * Parses ISO duration string to a Date object
  * @param {string} durationString - E.g. P3Y6M4DT12H30M5S
@@ -279,4 +279,15 @@ export function ISODurationToDate(durationString) {
     durationParts.minutes,
     durationParts.seconds
   );
+}
+
+/**
+ * @param {string} duration - E.g. P2DT12H30M5S
+ * @returns {number} Hours
+ */
+export function ISODurationSubsetToHours(duration) {
+  const { years, months, days, hours, minutes, seconds } = parseISODuration(duration);
+  if (years || months) throw new Error('Years and months are not supported');
+
+  return days * 24 + hours + minutes / 60 + seconds / 3600;
 }
