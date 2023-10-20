@@ -86,7 +86,7 @@ const configSchema = yup.object().shape({
  */
 export function validateAndProcessBountyConfig(config) {
   try {
-    const validatedConfig = { ...configSchema.validateSync(config) };
+    const validatedConfig = { ...configSchema.validateSync(config, { strict: true }) };
     validatedConfig.referenceDate = ISODateToDate(config.referenceDate);
     return validatedConfig;
   } catch (error) {
@@ -210,7 +210,7 @@ export async function initalizeBountyConfig() {
       validate: validateNumber,
     });
 
-    config.hoursOnWorkdays = hoursOnWorkdays;
+    config.hoursOnWorkdays = parseFloat(hoursOnWorkdays);
   } else {
     console.log(
       'Found expected registered hours per day from old config, will use that:',
@@ -229,7 +229,7 @@ export async function initalizeBountyConfig() {
       validate: validateNumber,
     });
 
-    config.hoursOnHolidays = hoursOnHolidays;
+    config.hoursOnHolidays = parseFloat(hoursOnHolidays);
   } else {
     console.log(
       'Found expected registered hours on holidays from old config, will use that:',
