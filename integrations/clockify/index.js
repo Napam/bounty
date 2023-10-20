@@ -78,7 +78,7 @@ export async function getWorkHours(from, to) {
  * @param {IgnoreEntryFilter[]} filters
  * @param {ProjectAndTotalTime} entry
  */
-function determineIfShouldIgnore(filters, entry) {
+export function determineIfShouldIgnore(filters, entry) {
   for (const [keyToIgnore, valueToIgnore] of Object.entries(filters)) {
     if (!(entry[keyToIgnore] === valueToIgnore)) {
       return false;
@@ -91,7 +91,7 @@ function determineIfShouldIgnore(filters, entry) {
  * @param {number} num
  * @returns {string}
  */
-function numberToHHMM(num) {
+export function numberToHHMM(num) {
   const hours = Math.floor(num);
   const minutes = Math.round((num - hours) * 60);
   const hoursStr = hours.toString().padStart(2, '0');

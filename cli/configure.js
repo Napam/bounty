@@ -47,7 +47,7 @@ import * as yup from 'yup';
  * @property {number} expectedRegisteredHoursOnHolidays - The expected registered hours on holidays.
  */
 
-const configSchema = yup.object().shape({
+export const configSchema = yup.object().shape({
   version: yup.string().required(),
   integration: yup.string().oneOf(['harvest', 'clockify']).required(),
   hoursOnWorkdays: yup.number().required(),
