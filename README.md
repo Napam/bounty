@@ -3,6 +3,12 @@
 A tool to calculate flex balance for time tracker programs that does not
 have flex balance tracking 🙃
 
+Internally all this program does is to calculate the expected amount of
+registered work hours and then calculating the difference between the expected
+amount of work hours and the actual registered worked hours. The tricky parts
+are dealing with holidays, weekends, registered hours that should be ignored
+(such as overtime).
+
 Features:
 
 - Holiday handling!
@@ -41,14 +47,13 @@ The first `bounty` invocation will prompt for user info. The core bounty info is
 stored in `~/.bounty/config.json`, which you can alter manually in case you want
 to change or fix something. The core config is for example
 
-TODO: Add definition for workdays
-
 ```json
 {
   "version": "1",
   "integration": "clockify",
   "referenceDate": "2023-08-14",
   "referenceBalance": 2,
+  "workdays": ["monday", "tuesday", "wednesday", "thursday", "friday"],
   "hoursOnWorkdays": 7.5,
   "hoursOnHolidays": 0,
   "hoursOnSpecificHolidays": {
@@ -65,6 +70,16 @@ Config values
 
 - **referenceBalance**: The flex balance you had at the _end_ of the
   referenceDate
+
+- **workdays**: The expected work days. Valid values are
+
+  - `monday`
+  - `tuesday`
+  - `wednesday`
+  - `thursday`
+  - `friday`
+  - `saturday`
+  - `sunday`
 
 - **hoursOnWorkdays**: The amount of hours you are expected to register on
   working days.
@@ -83,24 +98,24 @@ Config values
 In `hoursOnSpecificHolidays` you can define how many hours it is expected to
 register for specific holidays. The available holidays are:
 
-```
-palmSunday
-holyWednesday
-maundyThursday
-goodFriday
-easterSunday
-easterMonday
-ascensionDay
-whitsun
-whitMonday
-newYear
-workersDay
-independenceDay (17. may, Norwegian independence day)
-christmasEve
-christmasDay
-boxingDay
-newYearsEve
-```
+| Value             | English Name     | Norwegian Name        | Date           |
+| ----------------- | ---------------- | --------------------- | -------------- |
+| `palmSunday`      | Palm Sunday      | Palmesøndag           | Varies by year |
+| `holyWednesday`   | Holy Wednesday   | Stille Onsdag         | Varies by year |
+| `maundyThursday`  | Maundy Thursday  | Skjærtorsdag          | Varies by year |
+| `goodFriday`      | Good Friday      | Langfredag            | Varies by year |
+| `easterSunday`    | Easter Sunday    | Første påskedag       | Varies by year |
+| `easterMonday`    | Easter Monday    | Andre påskedag        | Varies by year |
+| `ascensionDay`    | Ascension Day    | Kristi himmelfartsdag | Varies by year |
+| `whitsun`         | Whitsun          | Første pinsedag       | Varies by year |
+| `whitMonday`      | Whit Monday      | Andre pinsedag        | Varies by year |
+| `newYear`         | New Year         | Første nyttårsdag     | January 1      |
+| `workersDay`      | Workers' Day     | Arbeidernes dag       | May 1          |
+| `independenceDay` | Independence Day | Nasjonaldagen         | May 17         |
+| `christmasEve`    | Christmas Eve    | Julaften              | December 24    |
+| `christmasDay`    | Christmas Day    | Første juledag        | December 25    |
+| `boxingDay`       | Boxing Day       | Andre juledag         | December 26    |
+| `newYearsEve`     | New Year's Eve   | Nyttårsaften          | December 31    |
 
 If you were to specify the same number for all holidays:
 
@@ -121,7 +136,7 @@ If you were to specify the same number for all holidays:
 }
 ```
 
-then that would be equivalent to just setting `hoursOnHolidays` to `7.5`. And
+then that would be equivalent to just setting `hoursOnHolidays` to `7.5` and
 leaving `hoursOnSpecificHolidays` empty like this:
 
 ```javascript
@@ -231,6 +246,6 @@ Config values:
   different behavior. In the clockify config you can specify `projectName`,
   `clientName` and `label`. The more you specify, the more specific the "query"
   will become. For example if you only specify `{"projectName": "Test"}`, then you
-  will everything that goes under the project named "Test". If you specify more,
+  will ignore everything that goes under the project named "Test". If you specify more,
   such as `{"projectName": "Test", "label": "Meeting"}`, then everything that is
   under the project "Test" AND that has the label "Meeting" will be ignored.
