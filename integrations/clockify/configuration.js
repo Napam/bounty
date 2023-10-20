@@ -33,18 +33,25 @@ const ClockifyConfigSchema = yup.object().shape({
 });
 
 /**
+ * @param {ClockifyConfig} config
+ */
+function validateClockifyConfig(config) {
+  try {
+    return ClockifyConfigSchema.validateSync(config, { strict: true });
+  } catch (error) {
+    console.error(
+      `\x1b[31mError while processing config file \x1b[33m${CLOCKIFY_CONFIG_FILE}\x1b[m:\n${error}`
+    );
+    process.exit(1);
+  }
+}
+
+/**
  * @returns {Promise<ClockifyConfig>}
  */
 export async function setupFilesInHomeAndPromptForInfo() {
   if (fs.existsSync(CLOCKIFY_CONFIG_FILE)) {
-    try {
-      return ClockifyConfigSchema.validateSync(getConfig(), { strict: true });
-    } catch (error) {
-      console.error(
-        `\x1b[31mError while processing config file \x1b[33m${CLOCKIFY_CONFIG_FILE}\x1b[m:\n${error}`
-      );
-      process.exit(1);
-    }
+    return validateClockifyConfig(config);
   }
 
   const config = { version: '1' };
@@ -92,9 +99,9 @@ export async function setupFilesInHomeAndPromptForInfo() {
 
   config.entriesToIgnore = [];
 
-  ClockifyConfigSchema.validateSync(config, { strict: true });
-  fs.writeFileSync(CLOCKIFY_CONFIG_FILE, JSON.stringify(config, null, 2));
-  return config;
+  const validatedConfig = validateClockifyConfig(config)
+  fs.writeFileSync(CLOCKIFY_CONFIG_FILE, JSON.stringify(validatedConfig, null, 2));
+  return validatedConfig;
 }
 
 /** @type {ClockifyConfig | null} */

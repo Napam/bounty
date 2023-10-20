@@ -46,6 +46,7 @@ export default [
         'Harvest-Account-ID': accountId,
         Authorization: 'Bearer ' + token,
       },
+      entriesToIgnore: [],
     };
   },
 
@@ -97,7 +98,7 @@ export default [
     }
 
     return {
-      version: 4,
+      version: '4',
       headers: config.headers,
       entriesToIgnore: config.entriesToIgnore,
     };

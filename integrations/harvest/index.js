@@ -1,6 +1,6 @@
 import * as dates from '../../core/dates.js';
 import { setupFilesInHomeAndPromptForInfo } from './configuration.js';
-import { CONFIG_FILE } from './constants.js';
+import { HARVEST_CONFIG_FILE } from './constants.js';
 import axios from 'axios';
 import { getConfig as getCoreConfig, validateAndProcessBountyConfig } from '../../cli/configure.js';
 
@@ -17,9 +17,9 @@ export async function* timeEntryGenerator(headers, from, to) {
     while (res.links.next && (res = await get(res.links.next)));
   } catch (error) {
     console.log(`\x1b[31mAn error occured when attempting to get data from Harvest\x1b[0m`);
-    console.log('Attempt to display axios error:', error?.response?.data);
-    console.log(`Are the values in \x1b[33m${CONFIG_FILE}\x1b[0m correct?`);
-    process.exit();
+    console.log('Response from harvest:', error?.response?.data);
+    console.log(`Are the values in \x1b[33m${HARVEST_CONFIG_FILE}\x1b[0m correct?`);
+    process.exit(1);
   }
 }
 

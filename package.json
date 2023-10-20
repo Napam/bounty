@@ -12,7 +12,8 @@
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --maxWorkers 2",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --maxWorkers 2"
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --maxWorkers 2",
+    "lint": "eslint . --ext .js"
   },
   "bin": {
     "bounty": "./cli/index.js"

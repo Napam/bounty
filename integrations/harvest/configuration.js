@@ -1,6 +1,7 @@
 import fs from 'fs';
 import readline from 'readline';
-import { CONFIG_FILE } from './constants.js';
+import { HARVEST_CONFIG_FILE } from './constants.js';
+import yup from 'yup';
 
 /**
  * @typedef {Object} HarvestConfig
@@ -12,9 +13,37 @@ import { CONFIG_FILE } from './constants.js';
  * @returns {Promise<HarvestConfig>}
  */
 
+const EntryToIgnoreSchema = yup.object().shape({
+  project: yup.string().required(),
+  task: yup.string().required(),
+});
+
+const HarvestConfigSchema = yup.object().shape({
+  version: yup.string().required(),
+  headers: yup.object().shape({
+    'Harvest-Account-ID': yup.string().required(),
+    Authorization: yup.string().required(),
+  }),
+  entriesToIgnore: yup.array().of(EntryToIgnoreSchema).required(),
+});
+
+/**
+ * @param {HarvestConfig} config
+ */
+function validateHarvestConfig(config) {
+  try {
+    return HarvestConfigSchema.validateSync(config, { strict: true });
+  } catch (error) {
+    console.error(
+      `\x1b[31mError while processing config file \x1b[33m${HARVEST_CONFIG_FILE}\x1b[m:\n${error}`
+    );
+    process.exit(1);
+  }
+}
+
 export async function setupFilesInHomeAndPromptForInfo() {
   const bootstrapFiles = async () => {
-    return fs.existsSync(CONFIG_FILE) ? getConfig() : {};
+    return fs.existsSync(HARVEST_CONFIG_FILE) ? getConfig() : {};
   };
 
   // Now assume config file has never been incorrectly altered
@@ -26,21 +55,22 @@ export async function setupFilesInHomeAndPromptForInfo() {
   }
 
   if (currConfig === initConfig) {
-    return initConfig;
+    return validateHarvestConfig(initConfig);
   }
 
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const question = (string) => new Promise((resolve) => rl.question(string, resolve));
 
-  setConfig(currConfig);
+  const validatedConfig = validateHarvestConfig(currConfig);
+  setConfig(validatedConfig);
   console.log();
-  console.log(`Harvest config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${CONFIG_FILE}\x1b[m`);
+  console.log(`Harvest config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${HARVEST_CONFIG_FILE}\x1b[m`);
   console.log();
   console.log(`If something crashes, make sure that the config values makes sense:`);
   console.log(currConfig);
   await question('Press enter to continue');
   rl.close();
-  return currConfig;
+  return validatedConfig;
 }
 
 /** @type {ClockifyConfig | null} */
@@ -53,10 +83,10 @@ export function getConfig() {
   if (config != null) {
     return config;
   }
-  config = JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
+  config = JSON.parse(fs.readFileSync(HARVEST_CONFIG_FILE).toString());
   return config;
 }
 
 export function setConfig(config) {
-  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 4));
+  fs.writeFileSync(HARVEST_CONFIG_FILE, JSON.stringify(config, null, 4));
 }

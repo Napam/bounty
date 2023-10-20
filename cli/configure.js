@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { BOUNTY_CONFIG_DIR, BOUNTY_CORE_CONFIG_FILE } from '../core/constants.js';
-import { CONFIG_FILE as HARVEST_CONFIG_FILE } from '../integrations/harvest/constants.js';
+import { HARVEST_CONFIG_FILE } from '../integrations/harvest/constants.js';
 import inquirer from 'inquirer';
 import { NorwegianHoliday } from '../core/holidays.js';
 import { ISODateToDate, isoDateRegex, Day } from '../core/dates.js';
