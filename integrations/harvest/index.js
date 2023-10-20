@@ -57,7 +57,7 @@ export async function getWorkHours(from, to) {
 export async function afterRun({ balance }) {
   const coreConfig = validateAndProcessBountyConfig(getCoreConfig());
 
-  console.log('referenceDate :>> ', coreConfig.toLocaleDateString('no-NB'));
+  console.log('referenceDate :>> ', coreConfig.referenceDate.toLocaleDateString('no-NB'));
   console.log('referenceBalance :>> ', coreConfig.referenceBalance);
   console.log('currDate :>> ', new Date().toLocaleDateString('no-NB'));
   console.log('currBalance :>> ', balance);
