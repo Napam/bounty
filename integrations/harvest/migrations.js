@@ -97,7 +97,7 @@ export default [
     }
 
     return {
-      version: config.version,
+      version: 4,
       headers: config.headers,
       entriesToIgnore: config.entriesToIgnore,
     };
