@@ -1,7 +1,8 @@
 import fs from 'fs';
-import { CONFIG_FILE } from './constants.js';
+import { CLOCKIFY_CONFIG_FILE } from './constants.js';
 import inquirer from 'inquirer';
 import axios from 'axios';
+import yup from 'yup';
 
 /**
  * @typedef {Object} IgnoreEntryFilter
@@ -18,12 +19,32 @@ import axios from 'axios';
  * @property {IgnoreEntryFilter[]} entriesToIgnore - Entries that are to be ignored, e.g. vacation entries
  */
 
+const IgnoreEntryFilterSchema = yup.object().shape({
+  projectName: yup.string(),
+  clientName: yup.string(),
+  label: yup.string(),
+});
+
+const ClockifyConfigSchema = yup.object().shape({
+  apiKey: yup.string().required(),
+  userId: yup.string().required(),
+  workspaceId: yup.string().required(),
+  entriesToIgnore: yup.array().of(IgnoreEntryFilterSchema).required(),
+});
+
 /**
  * @returns {Promise<ClockifyConfig>}
  */
 export async function setupFilesInHomeAndPromptForInfo() {
-  if (fs.existsSync(CONFIG_FILE)) {
-    return getConfig();
+  if (fs.existsSync(CLOCKIFY_CONFIG_FILE)) {
+    try {
+      return ClockifyConfigSchema.validateSync(getConfig(), { strict: true });
+    } catch (error) {
+      console.error(
+        `\x1b[31mError while processing config file \x1b[33m${CLOCKIFY_CONFIG_FILE}\x1b[m:\n${error}`
+      );
+      process.exit(1);
+    }
   }
 
   const config = { version: '1' };
@@ -71,7 +92,8 @@ export async function setupFilesInHomeAndPromptForInfo() {
 
   config.entriesToIgnore = [];
 
-  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+  ClockifyConfigSchema.validateSync(config, { strict: true });
+  fs.writeFileSync(CLOCKIFY_CONFIG_FILE, JSON.stringify(config, null, 2));
   return config;
 }
 
@@ -83,6 +105,6 @@ export function getConfig() {
   if (config != null) {
     return config;
   }
-  config = JSON.parse(fs.readFileSync(CONFIG_FILE).toString());
+  config = JSON.parse(fs.readFileSync(CLOCKIFY_CONFIG_FILE).toString());
   return config;
 }
