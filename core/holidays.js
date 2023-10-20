@@ -83,7 +83,7 @@ export function getNorwegianHolidays(year) {
 }
 
 /**
- * Generator returning norwegian holidays between 'from' and 'to' dates
+ * Generator producing norwegian holidays between 'from' and 'to' dates
  * @param {Date} from
  * @param {Date} to
  * @returns {Generator<{name: string, date: Date}>, void, void>}

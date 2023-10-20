@@ -3,7 +3,7 @@ import { BOUNTY_CONFIG_DIR, BOUNTY_CORE_CONFIG_FILE } from '../core/constants.js
 import { CONFIG_FILE as HARVEST_CONFIG_FILE } from '../integrations/harvest/constants.js';
 import inquirer from 'inquirer';
 import { NorwegianHoliday } from '../core/holidays.js';
-import { ISODateToDate, isoDateRegex } from '../core/dates.js';
+import { ISODateToDate, isoDateRegex, Day } from '../core/dates.js';
 import * as yup from 'yup';
 
 /**
@@ -11,10 +11,11 @@ import * as yup from 'yup';
  * @typedef {Object} RawBountyConfig
  * @property {string} version
  * @property {'harvest' | 'clockify'} integration
- * @property {number} hoursOnWorkdays - Expected registered hours on workdays
- * @property {number} hoursOnHolidays - Expected registered hours on holidays
  * @property {string} referenceDate - Date in ISO format (YYYY-MM-DD), this is a date where you know what your flex balance was
  * @property {number} referenceBalance - Your flex balance at the reference date
+ * @property {Day[]} workdays - Your workdays
+ * @property {number} hoursOnWorkdays - Expected registered hours on workdays
+ * @property {number} hoursOnHolidays - Expected registered hours on holidays
  * @property {Record<string, number>} hoursOnSpecificHolidays - Map that maps a string to a number, where the string is the name of a holiday and the number is the expected registered hours
  */
 
@@ -23,10 +24,11 @@ import * as yup from 'yup';
  * @typedef {Object} BountyConfig
  * @property {string} version
  * @property {'harvest' | 'clockify'} integration
- * @property {number} hoursOnWorkdays - Expected registered hours on workdays
- * @property {number} hoursOnHolidays - Expected registered hours on holidays
  * @property {Date} referenceDate - this is a date where you know what your flex balance was
  * @property {number} referenceBalance - Your flex balance at the reference date
+ * @property {Day[]} workdays - Your workdays
+ * @property {number} hoursOnWorkdays - Expected registered hours on workdays
+ * @property {number} hoursOnHolidays - Expected registered hours on holidays
  * @property {Record<string, number>} hoursOnSpecificHolidays - Map that maps a string to a number, where the string is the name of a holiday and the number is the expected registered hours
  */
 
@@ -50,10 +52,14 @@ import * as yup from 'yup';
 export const configSchema = yup.object().shape({
   version: yup.string().required(),
   integration: yup.string().oneOf(['harvest', 'clockify']).required(),
-  hoursOnWorkdays: yup.number().required(),
-  hoursOnHolidays: yup.number().required(),
   referenceDate: yup.string().required(),
   referenceBalance: yup.number().required(),
+  workdays: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(Day)))
+    .required(),
+  hoursOnWorkdays: yup.number().required(),
+  hoursOnHolidays: yup.number().required(),
   hoursOnSpecificHolidays: yup
     .object()
     .nullable()
@@ -261,7 +267,61 @@ export async function initalizeBountyConfig() {
     [NorwegianHoliday.CHRISTMAS_EVE]: parseFloat(hoursOnChristmasEve),
   };
 
-  const validatedconfig = validateAndProcessBountyConfig(config);
-  fs.writeFileSync(BOUNTY_CORE_CONFIG_FILE, JSON.stringify(config, null, 2));
+  const { workdays } = await inquirer.prompt({
+    type: 'checkbox',
+    name: 'workdays',
+    message: 'Select your workdays:',
+    choices: [
+      {
+        name: 'Monday',
+        value: Day.MONDAY,
+        checked: true,
+      },
+      {
+        name: 'Tuesday',
+        value: Day.TUESDAY,
+        checked: true,
+      },
+      {
+        name: 'Wednesday',
+        value: Day.WEDNESDAY,
+        checked: true,
+      },
+      {
+        name: 'Thursday',
+        value: Day.THURSDAY,
+        checked: true,
+      },
+      {
+        name: 'Friday',
+        value: Day.FRIDAY,
+        checked: true,
+      },
+      {
+        name: 'Saturday',
+        value: Day.SATURDAY,
+      },
+      {
+        name: 'Sunday',
+        value: Day.SUNDAY,
+      },
+    ],
+  });
+
+  config.workdays = workdays;
+
+  const orderedConfig = {
+    version: config.version,
+    integration: config.integration,
+    referenceDate: config.referenceDate,
+    referenceBalance: config.referenceBalance,
+    workdays: config.workdays,
+    hoursOnWorkdays: config.hoursOnWorkdays,
+    hoursOnHolidays: config.hoursOnHolidays,
+    hoursOnSpecificHolidays: config.hoursOnSpecificHolidays,
+  };
+
+  const validatedconfig = validateAndProcessBountyConfig(orderedConfig);
+  fs.writeFileSync(BOUNTY_CORE_CONFIG_FILE, JSON.stringify(orderedConfig, null, 2));
   return validatedconfig;
 }

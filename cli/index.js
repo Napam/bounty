@@ -24,7 +24,7 @@ async function getIntegration(config) {
   );
 }
 
-function incrementDateIfBeforeToday(date) {
+export function incrementDateIfBeforeToday(date) {
   return offsetDate(date, {
     days: date.getTime() < getTodayDate().getTime(),
   });
@@ -37,9 +37,11 @@ async function run() {
   const from = incrementDateIfBeforeToday(bountyConfig.referenceDate);
   const to = getTodayDate();
   const workedHours = await getWorkHours(from, to);
-  const { referenceBalance, hoursOnWorkdays, hoursOnHolidays, hoursOnSpecificHolidays } = bountyConfig;
+  const { referenceBalance, workdays, hoursOnWorkdays, hoursOnHolidays, hoursOnSpecificHolidays } =
+    bountyConfig;
   const balance = calcFlexBalance(workedHours, from, referenceBalance, {
     to,
+    workdays,
     hoursOnWorkdays,
     hoursOnHolidays,
     hoursOnSpecificHolidays,
@@ -47,4 +49,6 @@ async function run() {
   await afterRun({ from, to, balance });
 }
 
-run();
+if (process.env.NODE_ENV !== 'test') {
+  run();
+}

@@ -1,12 +1,15 @@
 import { configSchema } from './configure';
 
-test('validate bounty config schema works', () => {
+test('validate bounty config schema throws error on empty object', () => {
   expect(() => configSchema.validateSync({})).toThrowError();
+});
 
+test('validate bounty config schema works on valid config', () => {
   configSchema.validateSync(
     {
       version: '1',
       integration: 'harvest',
+      workdays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
       hoursOnWorkdays: 3,
       hoursOnHolidays: 0,
       referenceDate: '2021-01-01',
