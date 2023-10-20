@@ -58,19 +58,25 @@ TODO: Add definition for workdays
 }
 ```
 
-#### referenceDate and referenceBalance
+Config values
 
-The properties `referenceDate` and `referenceBalance` are used to accomodate for
-your previous flex balance. That is, for the property `referenceDate` enter
-an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for
-property `referenceBalance` enter said flextime.
+- **referenceDate**: A date of which you knew the flex balance at _the end of
+  the day_.
 
-#### hoursOnWorkdays and hoursOnHolidays
+- **referenceBalance**: The flex balance you had at the _end_ of the
+  referenceDate
 
-The amount of hours you are expected to register on workdays and holidays
-respectively. With holidays I mean christmas and such. The `hoursOnHolidays` will
-define the amount of hours that is expected to be registered for _all_ holidays.
-If you need more granular control, see the next section.
+- **hoursOnWorkdays**: The amount of hours you are expected to register on
+  working days.
+
+- **hoursOnHolidays**: The amount of hours you are expected to register on
+  holidays. This is mostly relevant if you workplace expects you to register
+  "Holiday" or something for all holidays. See information about
+  `hoursOnSpecificHolidays` for more information about holidays.
+
+- **hoursOnSpecificHolidays**: Defines the amount of hours that is expected to
+  on each holiday. Bounty should ask you to specifiy some of the common holidays
+  on the first invocation. See section below for more information.
 
 #### hoursOnSpecificHolidays
 
@@ -89,11 +95,60 @@ whitsun
 whitMonday
 newYear
 workersDay
-independenceDay
+independenceDay (17. may, Norwegian independence day)
 christmasEve
 christmasDay
 boxingDay
 newYearsEve
+```
+
+If you were to specify the same number for all holidays:
+
+```javascript
+{
+  .
+  .
+  .
+  "hoursOnHolidays": 0,
+  "hoursOnSpecificHolidays": {
+    "palmSunday": 7.5,
+    "holyWednesday": 7.5,
+    "maundyThursday": 7.5
+    .
+    .
+    .
+  }
+}
+```
+
+then that would be equivalent to just setting `hoursOnHolidays` to `7.5`. And
+leaving `hoursOnSpecificHolidays` empty like this:
+
+```javascript
+{
+  .
+  .
+  .
+  "hoursOnHolidays": 7.5,
+  "hoursOnSpecificHolidays": {}
+}
+```
+
+`hoursOnSpecificHolidays` are for exceptions. For example in the following
+config you specify that you won't register any hours (zero hours) on holidays in general, but
+you want to register `3.75` hours just on holy wednesday and christmas eve.
+
+```javascript
+{
+  .
+  .
+  .
+  "hoursOnHolidays": 0,
+  "hoursOnSpecificHolidays": {
+    "holyWednesday": 3.75,
+    "christmasEve": 3.75
+  }
+}
 ```
 
 ## Providers
@@ -121,10 +176,26 @@ The config file for Harvest is `~/.bounty/harvest.json`, here is an example:
 }
 ```
 
-You can get your Harvest info at https://id.getharvest.com/developers. Bounty
-should prompt you for it in your first bounty invocation.
+Config values
+
+- **version**: The `version` is just for tracking which version the harvest config is in. For
+  example over time one may want more configuration options and such. What has
+  been generally done is to implmenent "migrations" that automatically updates the
+  config as needed.
+
+- **headers**: The values in `headers` are used for authentication with Harvest. You can get
+  your Harvest info at https://id.getharvest.com/developers. Bounty should prompt
+  you for it in your first bounty invocation.
+
+- **entriesToIgnore**: One can specify what type of time entries one wants to ignore. This may
+  be relevant in the case of overtime work. If one registers hours that represents overtime work,
+  then one may not wan't to count those in the flex time balance.
+  You have to specify both the `project` and `task` values in order to ignore
+  entires, and they have to match exactly by string with the entries.
 
 ### Clockify
+
+NOTE: The Clockify integration only works for single workspaces.
 
 The config file for Clockify is `~/.bounty/clockify.json`, here is an example:
 
@@ -142,10 +213,24 @@ The config file for Clockify is `~/.bounty/clockify.json`, here is an example:
 }
 ```
 
-You can get your Clockify info at https://app.clockify.me/user/settings. The
-properties `referenceDate` and `referenceBalance` are used to accomodate for
-your previous flex balance. That is, for the property `referenceDate` enter
-an earlier date (`YYYY-MM-DD`) of which you knew your flextime, and for
-property `referenceBalance` enter said flextime. The values for userId will
-get inferred from your API key, but you will have to select / obtain a
-workspaceId.
+Config values:
+
+- **version**: Has the same role as in the Harvest config.
+
+- **apiKey**: Clockify authorization key. You can find your API key at
+  https://app.clockify.me/user/settings. Bounty should help find your userIds and
+  workspaceIds on your first invocation.
+
+- **userId**: Clockify user id. Bounty should figure it out for you in the first
+  invocation.
+
+- **workspaceId**: The Clockify workspace relevant for you. Bounty will guide
+  you through the process in the first invocation.
+
+- **entriesToIgnore**: Same purpose as in Harvest config, but has a little bit
+  different behavior. In the clockify config you can specify `projectName`,
+  `clientName` and `label`. The more you specify, the more specific the "query"
+  will become. For example if you only specify `{"projectName": "Test"}`, then you
+  will everything that goes under the project named "Test". If you specify more,
+  such as `{"projectName": "Test", "label": "Meeting"}`, then everything that is
+  under the project "Test" AND that has the label "Meeting" will be ignored.
