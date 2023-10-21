@@ -2,7 +2,7 @@ import * as dates from '../../core/dates.js';
 import { setupFilesInHomeAndPromptForInfo } from './configuration.js';
 import { HARVEST_CONFIG_FILE } from './constants.js';
 import axios from 'axios';
-import { getConfig as getCoreConfig, validateAndProcessBountyConfig } from '../../cli/configure.js';
+import { getConfig as getCoreConfig, validateAndProcessBountyConfig } from '../../cli/configuration.js';
 
 /**
  * @param {object} headers headers to send to harvest

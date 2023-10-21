@@ -1,7 +1,7 @@
 import fs from 'fs';
-import readline from 'readline';
 import { HARVEST_CONFIG_FILE } from './constants.js';
 import yup from 'yup';
+import inquirer from 'inquirer';
 
 /**
  * @typedef {Object} HarvestConfig
@@ -57,19 +57,19 @@ export async function setupFilesInHomeAndPromptForInfo() {
   if (currConfig === initConfig) {
     return validateHarvestConfig(initConfig);
   }
-
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const question = (string) => new Promise((resolve) => rl.question(string, resolve));
-
   const validatedConfig = validateHarvestConfig(currConfig);
   setConfig(validatedConfig);
   console.log();
   console.log(`Harvest config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${HARVEST_CONFIG_FILE}\x1b[m`);
-  console.log();
+  console.log(
+    `The installation wizard only configures some of the possible values. Make sure to properly configure all relevant values at \x1b[33m${HARVEST_CONFIG_FILE}\x1b[m`
+  );
   console.log(`If something crashes, make sure that the config values makes sense:`);
   console.log(currConfig);
-  await question('Press enter to continue');
-  rl.close();
+  await inquirer.prompt({
+    type: 'confirm',
+    name: 'Press enter to continue',
+  });
   return validatedConfig;
 }
 

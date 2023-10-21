@@ -2,7 +2,7 @@
 
 import { offsetDate, getTodayDate } from '../core/dates.js';
 import { calcFlexBalance } from '../core/index.js';
-import { initalizeBountyConfig } from './configure.js';
+import { initalizeBountyConfig } from './configuration.js';
 
 /**
  * Integration module
@@ -12,7 +12,7 @@ import { initalizeBountyConfig } from './configure.js';
  */
 
 /**
- * @param {import('./configure.js').BountyConfig} config
+ * @param {import('./configuration.js').BountyConfig} config
  * @returns {Promise<Integration>}
  */
 async function getIntegration(config) {

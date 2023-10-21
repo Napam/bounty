@@ -1,4 +1,4 @@
-import { configSchema } from './configure';
+import { configSchema } from './configuration';
 
 test('validate bounty config schema throws error on empty object', () => {
   expect(() => configSchema.validateSync({})).toThrowError();

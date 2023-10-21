@@ -12,7 +12,7 @@
  * incorrectly altered, and that the previous function has successfully ran.
  */
 
-import readline from 'readline';
+import inquirer from 'inquirer';
 
 export default [
   /**
@@ -28,15 +28,19 @@ export default [
     ) {
       return config;
     }
-
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const question = (string) => new Promise((resolve) => rl.question(string, resolve));
-
     console.log('Go to \x1b[33mhttps://id.getharvest.com/developers\x1b[m');
     console.log('Press "Create new personal access token" if you dont have one');
-    const token = await question('Copy and paste your token here: ');
-    const accountId = await question('Copy and paste Account ID here: ');
-    rl.close();
+    const { token } = await inquirer.prompt({
+      type: 'input',
+      name: 'token',
+      message: 'Copy and paste your account token here:',
+    });
+
+    const { accountId } = await inquirer.prompt({
+      type: 'input',
+      name: 'accountId',
+      message: 'Copy and paste your Account ID here:',
+    });
 
     console.log('Got token:', token);
     console.log('Got Account Id:', accountId);
@@ -83,7 +87,7 @@ export default [
       return config;
     }
 
-    return { ...config };
+    return { version: '3', ...config };
   },
 
   /**
