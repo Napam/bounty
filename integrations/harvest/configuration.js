@@ -12,6 +12,7 @@ import inquirer from 'inquirer';
 /**
  * @typedef {Object} HarvestConfig
  * @property {string} version - The version of the config.
+ * @property {string} userId - ID that will be used to filter time entries. Not the same as Harvest-Account-ID.
  * @property {Object} headers - The headers for the request.
  * @property {string} headers.Harvest-Account-ID - The Harvest Account ID.
  * @property {string} headers.Authorization - The Authorization token.
@@ -29,6 +30,7 @@ const HarvestConfigSchema = yup.object().shape({
     'Harvest-Account-ID': yup.string().required(),
     Authorization: yup.string().required(),
   }),
+  userId: yup.number().required(),
   entriesToIgnore: yup.array().of(EntryToIgnoreSchema).required(),
 });
 
@@ -63,7 +65,6 @@ export async function setupFilesInHomeAndPromptForInfo() {
     return validateHarvestConfig(initConfig);
   }
   const validatedConfig = validateHarvestConfig(currConfig);
-  setConfig(validatedConfig);
   console.log();
   console.log(`Harvest config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${HARVEST_CONFIG_FILE}\x1b[m`);
   console.log(
@@ -71,10 +72,17 @@ export async function setupFilesInHomeAndPromptForInfo() {
   );
   console.log(`If something crashes, make sure that the config values makes sense:`);
   console.log(currConfig);
-  await inquirer.prompt({
+  const { confirm } = await inquirer.prompt({
     type: 'confirm',
-    name: 'Press enter to continue',
+    name: 'confirm',
+    message: 'Confirm to continue',
   });
+
+  if (!confirm) {
+    console.log('Exiting...');
+    process.exit(0);
+  }
+  setConfig(validatedConfig);
   return validatedConfig;
 }
 

@@ -174,6 +174,7 @@ The config file for Harvest is `~/.bounty/harvest.json`, here is an example:
 ```json
 {
   "version": "4",
+  "userId": 42069,
   "headers": {
     "Harvest-Account-ID": "123123",
     "Authorization": "Bearer gucci.flipflops123123"
@@ -193,6 +194,10 @@ Config values
   example over time one may want more configuration options and such. What has
   been generally done is to implmenent "migrations" that automatically updates the
   config as needed.
+
+- **userId**: Used for filtering on user id. This is not the same as the
+`Harvest-Account-Id` you see in the `headers` object. Bounty should
+automatically set this value for you.
 
 - **headers**: The values in `headers` are used for authentication with Harvest. You can get
   your Harvest info at https://id.getharvest.com/developers. Bounty should prompt

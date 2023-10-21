@@ -74,7 +74,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
     config.userId = response.data.id;
   } catch (error) {
     console.error('Could not obtain userId from clockify', error.response.data);
-    process.exit();
+    process.exit(1);
   }
 
   try {
@@ -94,7 +94,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
     config.workspaceId = workspaceId;
   } catch (error) {
     console.error('Could not obtain workspace data from clockify', error.response.data);
-    process.exit();
+    process.exit(1);
   }
 
   config.entriesToIgnore = [];

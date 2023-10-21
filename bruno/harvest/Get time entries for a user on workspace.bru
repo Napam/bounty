@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: https://api.harvestapp.com/v2/time_entries?user_id={{accountId}}
+  url: https://api.harvestapp.com/v2/time_entries?user_id={{userId}}
   body: none
   auth: bearer
 }
 
 query {
-  user_id: {{accountId}}
+  user_id: {{userId}}
 }
 
 headers {

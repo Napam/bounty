@@ -13,21 +13,23 @@
  */
 
 import inquirer from 'inquirer';
+import axios from 'axios';
 
 export default [
   /**
    * Initial migration (should be ran on first bounty harvest run)
    */
   async function initBountyConfig(config) {
-    const objectIsEmpty = (object) => Object.keys(object).length === 0;
+    const objectIsNotEmpty = !(Object.keys(config).length === 0);
 
     if (
-      !objectIsEmpty(config) &&
+      objectIsNotEmpty &&
       config.headers['Harvest-Account-ID'] !== null &&
       config.headers['Authorization'] !== null
     ) {
       return config;
     }
+
     console.log('Go to \x1b[33mhttps://id.getharvest.com/developers\x1b[m');
     console.log('Press "Create new personal access token" if you dont have one');
     const { token } = await inquirer.prompt({
@@ -91,9 +93,10 @@ export default [
   },
 
   /**
-   * Migration function that is used for clearing up after refactoring
+   * Migration function that is used for clearing up after refactoring. But also adds userId.
+   *
    * referenceBalance, referenceDate, expectedRegisteredHoursOnWorkdays and
-   * expectedRegisteredHoursOnHolidays to core bounty config
+   * expectedRegisteredHoursOnHolidays have essentially moved to core bounty config
    * @param {object} config
    */
   async function migrate4(config) {
@@ -101,8 +104,21 @@ export default [
       return config;
     }
 
+    let userId = null;
+    try {
+      const response = await axios.get('https://api.harvestapp.com/v2/users/me', {
+        headers: config.headers,
+      });
+
+      userId = response.data.id;
+    } catch (error) {
+      console.error('Could not obtain user data from Harvest during setup', error.response.data);
+      process.exit(1);
+    }
+
     return {
       version: '4',
+      userId: userId,
       headers: config.headers,
       entriesToIgnore: config.entriesToIgnore,
     };

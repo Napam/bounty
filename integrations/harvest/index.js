@@ -27,15 +27,16 @@ import { getConfig as getCoreConfig, validateAndProcessBountyConfig } from '../.
  */
 
 /**
- * @param {object} headers headers to send to harvest
- * @param {string} from string of YYYY-MM-DD
- * @param {string} to string of YYYY-MM-DD
+ * @param {object} headers - headers to send to harvest
+ * @param {string} from - string of YYYY-MM-DD
+ * @param {string} to - string of YYYY-MM-DD
+ * @param {string} user_id - User ID to filter on
  * @returns {AsyncGenerator<HarvestTimeEntry, void, *>}
  */
-export async function* timeEntryGenerator(headers, from, to) {
+export async function* timeEntryGenerator(headers, from, to, user_id) {
   try {
     const get = async (url, params) => (await axios.get(url, { headers, params })).data;
-    let res = await get('https://api.harvestapp.com/v2/time_entries', { from, to });
+    let res = await get('https://api.harvestapp.com/v2/time_entries', { from, to, user_id });
     do for (let timeEntry of res.time_entries) yield timeEntry;
     while (res.links.next && (res = await get(res.links.next)));
   } catch (error) {
@@ -57,7 +58,8 @@ export async function getWorkHours(from, to) {
   for await (let timeEntry of timeEntryGenerator(
     config.headers,
     dates.dateToISODateWithoutOffset(from),
-    dates.dateToISODateWithoutOffset(to)
+    dates.dateToISODateWithoutOffset(to),
+    config.userId
   )) {
     hours += determineIfShouldIgnore(config.entriesToIgnore, timeEntry) * timeEntry.hours;
   }
