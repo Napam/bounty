@@ -61,23 +61,28 @@ export async function getWorkHours(from, to) {
     dates.dateToISODateWithoutOffset(to),
     config.userId
   )) {
-    hours += determineIfShouldIgnore(config.entriesToIgnore, timeEntry) * timeEntry.hours;
+    const shouldInclude = !applyFilters(config.entriesToIgnore, timeEntry);
+    hours += shouldInclude * timeEntry.hours;
   }
 
   return hours;
 }
 
 /**
- * @param {HarvestEntryFilter[]} filters
- * @param {HarvestTimeEntry} entry
+ * Returns true if the entry matches one of the filters, else false
+ * @param {HarvestTimeEntry[]} filters
+ * @param {ProjectAndTotalTime} entry
  */
-function determineIfShouldIgnore(filters, entry) {
-  for (const { project: projectNameToIgnore, task: taskNameToIgnore } of filters) {
-    if (entry.project.name === projectNameToIgnore && entry.task.name === taskNameToIgnore) {
-      return false;
+export function applyFilters(filters, entry) {
+  filterLoop: for (const filter of filters) {
+    for (const [keyToIgnore, valueToIgnore] of Object.entries(filter)) {
+      if (entry[keyToIgnore] !== valueToIgnore) {
+        continue filterLoop;
+      }
     }
+    return true;
   }
-  return true;
+  return false;
 }
 
 /**

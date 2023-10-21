@@ -63,10 +63,8 @@ export async function getWorkHours(from, to) {
 
   let hoursToIgnore = 0;
   for (const entry of Object.values(result.projectAndTotalTime)) {
-    for (const filters of config.entriesToIgnore) {
-      const shouldIgnore = determineIfShouldIgnore(filters, entry);
-      hoursToIgnore += shouldIgnore * dates.ISODurationSubsetToHours(entry.duration);
-    }
+    const shouldIgnore = applyFilters(config.entriesToIgnore, entry);
+    hoursToIgnore += shouldIgnore * dates.ISODurationSubsetToHours(entry.duration);
   }
 
   const { hours, minutes } = dates.parseISODuration(result.totalTime);
@@ -75,16 +73,20 @@ export async function getWorkHours(from, to) {
 }
 
 /**
+ * Returns true if the entry matches one of the filters, else false
  * @param {ClockifyEntryFilter[]} filters
  * @param {ProjectAndTotalTime} entry
  */
-export function determineIfShouldIgnore(filters, entry) {
-  for (const [keyToIgnore, valueToIgnore] of Object.entries(filters)) {
-    if (!(entry[keyToIgnore] === valueToIgnore)) {
-      return false;
+export function applyFilters(filters, entry) {
+  filterLoop: for (const filter of filters) {
+    for (const [keyToIgnore, valueToIgnore] of Object.entries(filter)) {
+      if (entry[keyToIgnore] !== valueToIgnore) {
+        continue filterLoop;
+      }
     }
+    return true;
   }
-  return true;
+  return false;
 }
 
 /**

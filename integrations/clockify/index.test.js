@@ -1,55 +1,19 @@
-import { determineIfShouldIgnore, numberToHHMM } from './index.js';
+import { applyFilters, numberToHHMM } from './index.js';
 
-test('determineIfShouldIgnore works', () => {
-  expect(
-    determineIfShouldIgnore(
-      {
-        projectName: 'project1',
-      },
-      { projectName: 'project1', clientName: 'test', label: 'test' }
-    )
-  ).toEqual(true);
+test('filter works', () => {
+  const filters = [
+    { projectName: 'Project1' },
+    { projectName: 'Project2', clientName: 'Client2' },
+    { projectName: 'Project3', clientName: 'Client3', label: 'Label3' },
+  ];
 
-  expect(
-    determineIfShouldIgnore(
-      {
-        projectName: 'project2',
-        clientName: 'client2',
-      },
-      { projectName: 'project2', clientName: 'client2', label: 'test' }
-    )
-  ).toEqual(true);
+  expect(applyFilters(filters, { projectName: 'Project1', clientName: 'test', label: 'test' })).toEqual(true);
+  expect(applyFilters(filters, { projectName: 'Project2', clientName: 'Client2', label: 'test' })).toEqual(true);
+  expect(applyFilters(filters, { projectName: 'Project3', clientName: 'Client3', label: 'Label3' })).toEqual(true);
 
-  expect(
-    determineIfShouldIgnore(
-      {
-        projectName: 'project3',
-        clientName: 'client3',
-        label: 'label3',
-      },
-      { projectName: 'project3', clientName: 'client3', label: 'label3' }
-    )
-  ).toEqual(true);
-
-  expect(
-    determineIfShouldIgnore(
-      {
-        projectName: 'project3',
-        clientName: 'client3',
-        label: 'label3',
-      },
-      { projectName: 'project2', clientName: 'client2' }
-    )
-  ).toEqual(false);
-
-  expect(
-    determineIfShouldIgnore(
-      {
-        projectName: 'project2',
-      },
-      { projectName: 'project' }
-    )
-  ).toEqual(false);
+  expect(applyFilters(filters, { projectName: 'Project2' })).toEqual(false);
+  expect(applyFilters(filters, { projectName: 'Project3', clientName: 'Client3', label: 'Test' })).toEqual(false);
+  expect(applyFilters(filters, { projectName: 'Project4' })).toEqual(false);
 });
 
 test('numberToHHMM works', () => {
