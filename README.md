@@ -9,26 +9,21 @@ amount of work hours and the actual registered worked hours. The tricky parts
 are dealing with holidays, weekends, registered hours that should be ignored
 (such as overtime).
 
-Features:
+### Features:
 
-- Holiday handling!
+- **Holiday handling!**
   - Some workplaces may want you to register hours on holidays, some don't,
     bounty has you covered! It is configurable.
   - Best suited for countries with holidays similar to Norway at the moment
     (Christian holidays mostly), but
     more can be implemented if desired.
-- Provider agnostic core logic!
+- **Provider agnostic core logic!**
   - Bounty's architechture is separeated into a "core" module and integration
     modules. It makes it easy to integrate multiple time tracking providers. As
     of now Bounty supports:
     - Harvest
     - Clockify
   - Send PR or create an issue if you want integration to something else.
-- Plan to make into a npm package that you can actually use with your own code!
-  - Not really a feature!
-  - It is already a npm package, but you can't really easily import it
-    conventionally as of now, but I think it would be cool to make it easily
-    importable. TODO: Ditch JSDoc and setup Typescript.
 
 # Requirements
 
@@ -41,11 +36,12 @@ Features:
 1. Assuming you have npm installed properly, you should now be able to run `bounty`
    in the terminal.
 
-# Info
+# Core bounty configuration
 
 The first `bounty` invocation will prompt for user info. The core bounty info is then
 stored in `~/.bounty/config.json`, which you can alter manually in case you want
-to change or fix something. The core config is for example
+to change or fix something. There will also be provider specific configuration
+files. See more about them below. The core config is for example:
 
 ```json
 {
@@ -206,7 +202,8 @@ Config values
   be relevant in the case of overtime work. If one registers hours that represents overtime work,
   then one may not wan't to count those in the flex time balance.
   You have to specify both the `project` and `task` values in order to ignore
-  entires, and they have to match exactly by string with the entries.
+  entires. The `project` and `task` values must match exactly with what has been
+  registered in Harvest.
 
 ### Clockify
 
