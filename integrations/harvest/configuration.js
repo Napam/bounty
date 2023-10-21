@@ -74,19 +74,20 @@ export async function setupFilesInHomeAndPromptForInfo() {
 }
 
 /** @type {ClockifyConfig | null} */
-let config = null;
+let _config = null;
 
 /**
  * @returns {HarvestConfig}
  */
 export function getConfig() {
-  if (config != null) {
-    return config;
+  if (_config != null) {
+    return _config;
   }
-  config = JSON.parse(fs.readFileSync(HARVEST_CONFIG_FILE).toString());
-  return config;
+  _config = JSON.parse(fs.readFileSync(HARVEST_CONFIG_FILE).toString());
+  return _config;
 }
 
 export function setConfig(config) {
+  _config = null;
   fs.writeFileSync(HARVEST_CONFIG_FILE, JSON.stringify(config, null, 4));
 }

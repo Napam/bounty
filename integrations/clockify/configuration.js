@@ -51,7 +51,7 @@ function validateClockifyConfig(config) {
  */
 export async function setupFilesInHomeAndPromptForInfo() {
   if (fs.existsSync(CLOCKIFY_CONFIG_FILE)) {
-    return validateClockifyConfig(config);
+    return validateClockifyConfig(getConfig());
   }
 
   const config = { version: '1' };
@@ -105,13 +105,13 @@ export async function setupFilesInHomeAndPromptForInfo() {
 }
 
 /** @type {ClockifyConfig | null} */
-let config = null;
+let _config = null;
 
 /** @returns {ClockifyConfig} */
 export function getConfig() {
-  if (config != null) {
-    return config;
+  if (_config != null) {
+    return _config;
   }
-  config = JSON.parse(fs.readFileSync(CLOCKIFY_CONFIG_FILE).toString());
-  return config;
+  _config = JSON.parse(fs.readFileSync(CLOCKIFY_CONFIG_FILE).toString());
+  return _config;
 }
