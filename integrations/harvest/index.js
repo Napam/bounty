@@ -70,18 +70,16 @@ export async function getWorkHours(from, to) {
 
 /**
  * Returns true if the entry matches one of the filters, else false
- * @param {HarvestTimeEntry[]} filters
- * @param {ProjectAndTotalTime} entry
+ * @param {HarvestEntryFilter[]} filters
+ * @param {HarvestTimeEntry} entry
  */
 export function applyFilters(filters, entry) {
-  filterLoop: for (const filter of filters) {
-    for (const [keyToIgnore, valueToIgnore] of Object.entries(filter)) {
-      if (entry[keyToIgnore] !== valueToIgnore) {
-        continue filterLoop;
-      }
+  for (const filter of filters) {
+    if (filter.project === entry.project.name && filter.task === entry.task.name) {
+      return true;
     }
-    return true;
   }
+
   return false;
 }
 

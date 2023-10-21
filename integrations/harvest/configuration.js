@@ -5,8 +5,8 @@ import inquirer from 'inquirer';
 
 /**
  * @typedef {Object} HarvestEntryFilter
- * @property {string} projectName
- * @property {string} clientName
+ * @property {string} project
+ * @property {string} task
  */
 
 /**
