@@ -19,11 +19,14 @@ import yup from 'yup';
  * @property {ClockifyEntryFilter[]} entriesToIgnore - Entries that are to be ignored, e.g. vacation entries
  */
 
-const ClockifyEntryFilterSchema = yup.object().shape({
-  projectName: yup.string(),
-  clientName: yup.string(),
-  label: yup.string(),
-});
+const ClockifyEntryFilterSchema = yup
+  .object()
+  .shape({
+    projectName: yup.string(),
+    clientName: yup.string(),
+    label: yup.string(),
+  })
+  .test('no-empty-filter', 'entriesToIgnore filters cannot be empty', (item) => Object.entries(item).length);
 
 const ClockifyConfigSchema = yup.object().shape({
   apiKey: yup.string().required(),
