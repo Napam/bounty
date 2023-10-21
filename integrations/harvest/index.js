@@ -5,9 +5,32 @@ import axios from 'axios';
 import { getConfig as getCoreConfig, validateAndProcessBountyConfig } from '../../cli/configuration.js';
 
 /**
+ * @typedef {import('./configuration.js').HarvestEntryFilter} HarvestEntryFilter
+ */
+
+/**
+ * @typedef {Object} HarvestTimeEntry
+ * @property {number} hours - The number of hours worked.
+ * @property {string} created_at - The date and time the time entry was created in ISO 8601 format.
+ * @property {string} updated_at - The date and time the time entry was last updated in ISO 8601 format.
+ * @property {Object} client - The client associated with the time entry.
+ * @property {number} client.id - The ID of the client.
+ * @property {string} client.name - The name of the client.
+ * @property {string} client.currency - The currency used by the client.
+ * @property {Object} project - The project associated with the time entry.
+ * @property {number} project.id - The ID of the project.
+ * @property {string} project.name - The name of the project.
+ * @property {string} project.code - The code of the project.
+ * @property {Object} task - The task associated with the time entry.
+ * @property {number} task.id - The ID of the task.
+ * @property {string} task.name - The name of the task.
+ */
+
+/**
  * @param {object} headers headers to send to harvest
  * @param {string} from string of YYYY-MM-DD
  * @param {string} to string of YYYY-MM-DD
+ * @returns {AsyncGenerator<HarvestTimeEntry, void, *>}
  */
 export async function* timeEntryGenerator(headers, from, to) {
   try {
@@ -30,25 +53,29 @@ export async function* timeEntryGenerator(headers, from, to) {
 export async function getWorkHours(from, to) {
   const config = await setupFilesInHomeAndPromptForInfo();
 
-  const zeroIfShouldIgnore = (timeEntry) => {
-    for (const { project: projectName, task: taskName } of config.entriesToIgnore) {
-      if (timeEntry.project.name === projectName && timeEntry.task.name === taskName) {
-        return 0;
-      }
-    }
-    return 1;
-  };
-
   let hours = 0;
   for await (let timeEntry of timeEntryGenerator(
     config.headers,
     dates.dateToISODateWithoutOffset(from),
     dates.dateToISODateWithoutOffset(to)
   )) {
-    hours += zeroIfShouldIgnore(timeEntry) * timeEntry.hours;
+    hours += determineIfShouldIgnore(config.entriesToIgnore, timeEntry) * timeEntry.hours;
   }
 
   return hours;
+}
+
+/**
+ * @param {HarvestEntryFilter[]} filters
+ * @param {HarvestTimeEntry} entry
+ */
+function determineIfShouldIgnore(filters, entry) {
+  for (const { project: projectNameToIgnore, task: taskNameToIgnore } of filters) {
+    if (entry.project.name === projectNameToIgnore && entry.task.name === taskNameToIgnore) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**

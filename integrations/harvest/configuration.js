@@ -4,18 +4,23 @@ import yup from 'yup';
 import inquirer from 'inquirer';
 
 /**
+ * @typedef {Object} HarvestEntryFilter
+ * @property {string} projectName
+ * @property {string} clientName
+ */
+
+/**
  * @typedef {Object} HarvestConfig
  * @property {string} version - The version of the config.
  * @property {Object} headers - The headers for the request.
  * @property {string} headers.Harvest-Account-ID - The Harvest Account ID.
  * @property {string} headers.Authorization - The Authorization token.
- * @property {Array<{project: string, task: string}>} entriesToIgnore - An array of entries to ignore.
- * @returns {Promise<HarvestConfig>}
+ * @property {HarvestEntryFilter[]} entriesToIgnore - An array of entries to ignore.
  */
 
 const EntryToIgnoreSchema = yup.object().shape({
-  project: yup.string().required(),
-  task: yup.string().required(),
+  project: yup.string(),
+  task: yup.string(),
 });
 
 const HarvestConfigSchema = yup.object().shape({

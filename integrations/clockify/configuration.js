@@ -5,7 +5,7 @@ import axios from 'axios';
 import yup from 'yup';
 
 /**
- * @typedef {Object} IgnoreEntryFilter
+ * @typedef {Object} ClockifyEntryFilter
  * @property {string} projectName
  * @property {string} clientName
  * @property {string} label
@@ -16,10 +16,10 @@ import yup from 'yup';
  * @property {string} apiKey - The API key.
  * @property {string} userId - The user ID.
  * @property {string} workspaceId - The workspace ID.
- * @property {IgnoreEntryFilter[]} entriesToIgnore - Entries that are to be ignored, e.g. vacation entries
+ * @property {ClockifyEntryFilter[]} entriesToIgnore - Entries that are to be ignored, e.g. vacation entries
  */
 
-const IgnoreEntryFilterSchema = yup.object().shape({
+const ClockifyEntryFilterSchema = yup.object().shape({
   projectName: yup.string(),
   clientName: yup.string(),
   label: yup.string(),
@@ -29,7 +29,7 @@ const ClockifyConfigSchema = yup.object().shape({
   apiKey: yup.string().required(),
   userId: yup.string().required(),
   workspaceId: yup.string().required(),
-  entriesToIgnore: yup.array().of(IgnoreEntryFilterSchema).required(),
+  entriesToIgnore: yup.array().of(ClockifyEntryFilterSchema).required(),
 });
 
 /**
@@ -99,7 +99,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
 
   config.entriesToIgnore = [];
 
-  const validatedConfig = validateClockifyConfig(config)
+  const validatedConfig = validateClockifyConfig(config);
   fs.writeFileSync(CLOCKIFY_CONFIG_FILE, JSON.stringify(validatedConfig, null, 2));
   return validatedConfig;
 }

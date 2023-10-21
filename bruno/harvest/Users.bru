@@ -1,0 +1,19 @@
+meta {
+  name: Users
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.harvestapp.com/v2/users/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  Harvest-Account-Id: {{accountId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,23 @@
+meta {
+  name: Get time entries for a user on workspace
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.harvestapp.com/v2/time_entries?user_id={{accountId}}
+  body: none
+  auth: bearer
+}
+
+query {
+  user_id: {{accountId}}
+}
+
+headers {
+  Harvest-Account-Id: {{accountId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

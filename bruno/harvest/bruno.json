@@ -1,0 +1,16 @@
+{
+  "version": "1",
+  "name": "Harvest",
+  "type": "collection",
+  "proxy": {
+    "enabled": false,
+    "protocol": "http",
+    "hostname": "",
+    "port": "",
+    "auth": {
+      "enabled": false,
+      "username": "",
+      "password": ""
+    }
+  }
+}

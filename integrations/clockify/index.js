@@ -4,7 +4,7 @@ import * as dates from '../../core/dates.js';
 
 /**
  * @typedef {import('./configuration.js').ClockifyConfig} ClockifyConfig
- * @typedef {import('./configuration.js').IgnoreEntryFilter} IgnoreEntryFilter
+ * @typedef {import('./configuration.js').ClockifyEntryFilter} ClockifyEntryFilter
  */
 
 /**
@@ -75,7 +75,7 @@ export async function getWorkHours(from, to) {
 }
 
 /**
- * @param {IgnoreEntryFilter[]} filters
+ * @param {ClockifyEntryFilter[]} filters
  * @param {ProjectAndTotalTime} entry
  */
 export function determineIfShouldIgnore(filters, entry) {
