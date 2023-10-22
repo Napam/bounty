@@ -30,11 +30,13 @@ are dealing with holidays, weekends, registered hours that should be ignored
 - Node v15 or higher
 - npm
 
-# Install
+# Install / Update
 
 1. `npm install -g @napam/bounty`
 1. Assuming you have npm installed properly, you should now be able to run `bounty`
    in the terminal.
+
+To uninstall do `npm uninstall -g @napam/bounty`
 
 # Core bounty configuration
 
