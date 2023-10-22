@@ -19,10 +19,20 @@ import inquirer from 'inquirer';
  * @property {HarvestEntryFilter[]} entriesToIgnore - An array of entries to ignore.
  */
 
-const EntryToIgnoreSchema = yup.object().shape({
-  project: yup.string(),
-  task: yup.string(),
-});
+const EntryToIgnoreSchema = yup
+  .object()
+  .shape({
+    project: yup.string(),
+    task: yup.string(),
+  })
+  .test((value, ctx) => {
+    if (!Object.entries(value).length) {
+      return ctx.createError({
+        message: `entriesToIgnore filters cannot be empty, but found empty object at ${ctx.path}`,
+      });
+    }
+    return true;
+  });
 
 const HarvestConfigSchema = yup.object().shape({
   version: yup.string().required(),

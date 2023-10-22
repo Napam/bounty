@@ -75,7 +75,18 @@ export async function getWorkHours(from, to) {
  */
 export function applyFilters(filters, entry) {
   for (const filter of filters) {
-    if (filter.project === entry.project.name && filter.task === entry.task.name) {
+    let projectMatch = true;
+    let taskMatch = true;
+
+    if (filter.project && filter.project !== entry.project.name) {
+      projectMatch = false;
+    }
+
+    if (filter.task && filter.task !== entry.task.name) {
+      taskMatch = false;
+    }
+
+    if (projectMatch && taskMatch) {
       return true;
     }
   }

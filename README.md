@@ -196,8 +196,8 @@ Config values
   config as needed.
 
 - **userId**: Used for filtering on user id. This is not the same as the
-`Harvest-Account-Id` you see in the `headers` object. Bounty should
-automatically set this value for you.
+  `Harvest-Account-Id` you see in the `headers` object. Bounty should
+  automatically set this value for you.
 
 - **headers**: The values in `headers` are used for authentication with Harvest. You can get
   your Harvest info at https://id.getharvest.com/developers. Bounty should prompt
@@ -206,8 +206,14 @@ automatically set this value for you.
 - **entriesToIgnore**: One can specify what type of time entries one wants to ignore. This may
   be relevant in the case of overtime work. If one registers hours that represents overtime work,
   then one may not wan't to count those in the flex time balance.
-  You have to specify both the `project` and `task` values in order to ignore
-  entires. The `project` and `task` values must match exactly with what has been
+
+  `entriesToIgnore` is basically an array of filters. You can specify either
+  `project`, `task` or both. The more you specify, the more specific the filter becomes.
+  For example if you only specify `{"project": "Absence"}`, then you will ignore everything that goes under
+  the project named "Absence". If you specify more, such as `{"project": "Absence", "task": "Time off"}`,
+  then everything that is under the project "Absence" AND has the task name "Time off" will be ignored.
+
+  The `project` and `task` values must match exactly with what has been
   registered in Harvest.
 
 ### Clockify
@@ -244,10 +250,13 @@ Config values:
 - **workspaceId**: The Clockify workspace relevant for you. Bounty will guide
   you through the process in the first invocation.
 
-- **entriesToIgnore**: Same purpose as in Harvest config, but has a little bit
-  different behavior. In the clockify config you can specify `projectName`,
-  `clientName` and `label`. The more you specify, the more specific the "query"
-  will become. For example if you only specify `{"projectName": "Test"}`, then you
-  will ignore everything that goes under the project named "Test". If you specify more,
-  such as `{"projectName": "Test", "label": "Meeting"}`, then everything that is
-  under the project "Test" AND that has the label "Meeting" will be ignored.
+- **entriesToIgnore**: Same purpose as in Harvest config, but with different filter values.
+  In the clockify config you can specify `projectName`, `clientName` and `label`.
+
+  The more you specify, the more specific the filter becomes. For example if you only
+  specify `{"projectName": "Test"}`, then you will ignore everything that goes under
+  the project named "Test". If you specify more, such as `{"projectName": "Test", "label": "Meeting"}`,
+  then everything that is under the project "Test" AND that has the label "Meeting" will be ignored.
+
+  The `projectName`, `clientName` and `label` values must match exactly what has
+  been registered in Clockify.

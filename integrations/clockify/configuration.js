@@ -26,7 +26,14 @@ const ClockifyEntryFilterSchema = yup
     clientName: yup.string(),
     label: yup.string(),
   })
-  .test('no-empty-filter', 'entriesToIgnore filters cannot be empty', (item) => Object.entries(item).length);
+  .test((value, ctx) => {
+    if (!Object.entries(value).length) {
+      return ctx.createError({
+        message: `entriesToIgnore filters cannot be empty, but found empty object at ${ctx.path}`,
+      });
+    }
+    return true;
+  });
 
 const ClockifyConfigSchema = yup.object().shape({
   apiKey: yup.string().required(),
