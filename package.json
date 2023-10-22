@@ -1,7 +1,7 @@
 {
   "name": "@napam/bounty",
   "private": false,
-  "version": "0.0.2",
+  "version": "0.1.0",
   "devDependencies": {
     "eslint": "^8.51.0",
     "eslint-plugin-jest": "^27.4.2",
