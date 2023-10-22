@@ -68,6 +68,7 @@ export default [
     if (parseInt(config.version) >= 2) {
       return config;
     }
+    console.log("Updating Harvest config to version '2'");
 
     return {
       version: '2',
@@ -88,6 +89,7 @@ export default [
     if (parseInt(config.version) >= 3) {
       return config;
     }
+    console.log("Updating Harvest config to version '3'");
 
     return { version: '3', ...config };
   },
@@ -103,6 +105,7 @@ export default [
     if (parseInt(config.version) >= 4) {
       return config;
     }
+    console.log("Updating Harvest config to version '4'");
 
     let userId = null;
     try {

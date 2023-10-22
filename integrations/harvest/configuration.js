@@ -77,10 +77,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
   const validatedConfig = validateHarvestConfig(currConfig);
   console.log();
   console.log(`Harvest config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${HARVEST_CONFIG_FILE}\x1b[m`);
-  console.log(
-    `The installation wizard only configures some of the possible values. Make sure to properly configure all relevant values at \x1b[33m${HARVEST_CONFIG_FILE}\x1b[m`
-  );
-  console.log(`If something crashes, make sure that the config values makes sense:`);
+  console.log(`Please assert that the values so far are correct before you continue:`);
   console.log(currConfig);
   const { confirm } = await inquirer.prompt({
     type: 'confirm',

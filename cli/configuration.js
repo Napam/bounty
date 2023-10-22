@@ -170,7 +170,7 @@ export async function initalizeBountyConfig() {
   config.integration = integration;
 
   // The reason for checking if the config values already exists is because one may already have it from an old harvest config
-  if (!oldHarvestConfig?.referenceDate) {
+  if (oldHarvestConfig?.referenceDate == null) {
     const { referenceDate } = await inquirer.prompt({
       type: 'input',
       name: 'referenceDate',
@@ -189,7 +189,7 @@ export async function initalizeBountyConfig() {
     config.referenceDate = oldHarvestConfig.referenceDate;
   }
 
-  if (!oldHarvestConfig?.referenceBalance) {
+  if (oldHarvestConfig?.referenceBalance == null) {
     const { referenceBalance } = await inquirer.prompt({
       type: 'input',
       name: 'referenceBalance',
@@ -206,7 +206,7 @@ export async function initalizeBountyConfig() {
     config.referenceBalance = oldHarvestConfig.referenceBalance;
   }
 
-  if (!oldHarvestConfig?.expectedRegisteredHoursOnWorkdays) {
+  if (oldHarvestConfig?.expectedRegisteredHoursOnWorkdays == null) {
     const defaultHoursOnWorkdays = 7.5;
     const { hoursOnWorkdays } = await inquirer.prompt({
       type: 'input',
@@ -225,7 +225,7 @@ export async function initalizeBountyConfig() {
     config.hoursOnWorkdays = oldHarvestConfig.expectedRegisteredHoursOnWorkdays;
   }
 
-  if (!oldHarvestConfig?.expectedRegisteredHoursOnHolidays) {
+  if (oldHarvestConfig?.expectedRegisteredHoursOnHolidays == null) {
     const defaultHoursOnHolidays = 7.5;
     const { hoursOnHolidays } = await inquirer.prompt({
       type: 'input',
@@ -322,6 +322,24 @@ export async function initalizeBountyConfig() {
   };
 
   const validatedconfig = validateAndProcessBountyConfig(orderedConfig);
+
+  console.log();
+  console.log(`Core config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${BOUNTY_CORE_CONFIG_FILE}\x1b[m`);
+  console.log('The core configuration wizard only configures some of the possible values.');
+  console.log(`Read docs at https://github.com/Napam/bounty to learn about all config values.`);
+  console.log(`Please assert that the values so far are correct before you continue:`);
+  console.log(orderedConfig);
+  const { confirm } = await inquirer.prompt({
+    type: 'confirm',
+    name: 'confirm',
+    message: 'Confirm to continue',
+  });
+
+  if (!confirm) {
+    console.log('Exiting...');
+    process.exit(0);
+  }
+
   fs.writeFileSync(BOUNTY_CORE_CONFIG_FILE, JSON.stringify(orderedConfig, null, 2));
   return validatedconfig;
 }

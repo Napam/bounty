@@ -110,6 +110,22 @@ export async function setupFilesInHomeAndPromptForInfo() {
   config.entriesToIgnore = [];
 
   const validatedConfig = validateClockifyConfig(config);
+
+  console.log();
+  console.log(`Clockify config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${CLOCKIFY_CONFIG_FILE}\x1b[m`);
+  console.log(`Please assert that the values so far are correct before you continue:`);
+  console.log(validatedConfig);
+  const { confirm } = await inquirer.prompt({
+    type: 'confirm',
+    name: 'confirm',
+    message: 'Confirm to continue',
+  });
+
+  if (!confirm) {
+    console.log('Exiting...');
+    process.exit(0);
+  }
+
   fs.writeFileSync(CLOCKIFY_CONFIG_FILE, JSON.stringify(validatedConfig, null, 2));
   return validatedConfig;
 }
