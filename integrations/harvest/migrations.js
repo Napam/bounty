@@ -52,7 +52,6 @@ export default [
         'Harvest-Account-ID': accountId,
         Authorization: 'Bearer ' + token,
       },
-      entriesToIgnore: [],
     };
   },
 
@@ -62,6 +61,9 @@ export default [
    *
    * Old migration logic:
    * Add version, expectedWorkHoursPerDay and entriesToIgnore
+   *
+   * New migration logic:
+   * Only add entriesToIgnore
    * @param {object} config
    */
   async function migrate2(config) {
