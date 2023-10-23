@@ -3,11 +3,9 @@
 A tool to calculate flex balance for time tracker programs that does not
 have flex balance tracking 🙃
 
-Internally all this program does is to calculate the expected amount of
-registered work hours and then calculating the difference between the expected
-amount of work hours and the actual registered worked hours. The tricky parts
-are dealing with holidays, weekends, registered hours that should be ignored
-(such as overtime).
+Internally all this program does is calculating the difference between the 
+actual end expected work hours. The tricky parts that Bounty handles are 
+holidays, weekends, registered hours that should be ignored (such as overtime).
 
 ### Features:
 
@@ -15,15 +13,15 @@ are dealing with holidays, weekends, registered hours that should be ignored
   - Some workplaces may want you to register hours on holidays, some don't,
     bounty has you covered! It is configurable.
   - Best suited for countries with holidays similar to Norway at the moment
-    (Christian holidays mostly), but
-    more can be implemented if desired.
+    (Christian holidays mostly), but more can be implemented if desired.
 - **Provider agnostic core logic!**
-  - Bounty's architechture is separeated into a "core" module and integration
+  - Bounty's architechture is separated into a "core" module and integration
     modules. It makes it easy to integrate multiple time tracking providers. As
     of now Bounty supports:
     - Harvest
     - Clockify
   - Send PR or create an issue if you want integration to something else.
+    - Or you can fork this project and do whatever really, it's MIT licensed.
 
 # Requirements
 
@@ -32,8 +30,8 @@ are dealing with holidays, weekends, registered hours that should be ignored
 
 # Install / Update
 
-1. `npm install -g @napam/bounty`
-1. Assuming you have npm installed properly, you should now be able to run `bounty`
+1. To update or install do `npm install -g @napam/bounty`
+1. Assuming you had npm installed properly, you should now be able to run `bounty`
    in the terminal.
 
 To uninstall do `npm uninstall -g @napam/bounty`
