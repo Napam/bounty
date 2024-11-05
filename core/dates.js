@@ -102,7 +102,7 @@ export function inWeekend(date) {
  */
 export function validateFromToDates(from, to, { fromAlias = 'from', toAlias = 'to' } = {}) {
   if (from.getTime() > to.getTime())
-    throw new Error(`"${fromAlias}" date cannot be later than "${toAlias}" date`);
+    throw new Error(`"${fromAlias}" (${from}) date cannot be later than "${toAlias}" date (${to})`);
 }
 
 /**
@@ -238,7 +238,9 @@ export const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
  */
 export function ISODateToDate(isoDate) {
   if (!isoDateRegex.test(isoDate)) throw new Error(`Invalid ISO date string: ${isoDate}`);
-  return new Date(isoDate);
+  const date = new Date(isoDate);
+  date.setHours(0, 0, 0, 0);
+  return date;
 }
 
 const ISODurationPattern =
