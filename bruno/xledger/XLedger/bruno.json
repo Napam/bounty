@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "XLedger",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

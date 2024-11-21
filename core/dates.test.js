@@ -187,5 +187,7 @@ test('ISODurationToDate works', () => {
 
 test('ISODateToDate works', () => {
   const date = dates.ISODateToDate('2023-02-13');
-  expect(date).toEqual(new Date(Date.UTC(2023, 1, 13)));
+  const expectedDate = new Date(2023, 1, 13);
+  expectedDate.setHours(0, 0, 0, 0);
+  expect(date).toEqual(expectedDate);
 });

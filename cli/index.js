@@ -18,8 +18,9 @@ import { initalizeBountyConfig } from './configuration.js';
 async function getIntegration(config) {
   return await import(
     {
-      harvest: '../integrations/harvest/index.js',
       clockify: '../integrations/clockify/index.js',
+      harvest: '../integrations/harvest/index.js',
+      xledger: '../integrations/xledger/index.js',
     }[config.integration]
   );
 }

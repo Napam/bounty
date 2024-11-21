@@ -3,6 +3,7 @@ import { CLOCKIFY_CONFIG_FILE } from './constants.js';
 import inquirer from 'inquirer';
 import axios from 'axios';
 import yup from 'yup';
+import { replaceEnvPlaceholders } from '../../core/placeholders.js';
 
 /**
  * @typedef {Object} ClockifyEntryFilter
@@ -61,7 +62,8 @@ function validateClockifyConfig(config) {
  */
 export async function setupFilesInHomeAndPromptForInfo() {
   if (fs.existsSync(CLOCKIFY_CONFIG_FILE)) {
-    return validateClockifyConfig(getConfig());
+    const validated = validateClockifyConfig(getConfig());
+    return replaceEnvPlaceholders(process.env, validated, CLOCKIFY_CONFIG_FILE);
   }
 
   const config = { version: '1' };
@@ -127,7 +129,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
   }
 
   fs.writeFileSync(CLOCKIFY_CONFIG_FILE, JSON.stringify(validatedConfig, null, 2));
-  return validatedConfig;
+  return replaceEnvPlaceholders(process.env, validatedConfig, CLOCKIFY_CONFIG_FILE);
 }
 
 /** @type {ClockifyConfig | null} */

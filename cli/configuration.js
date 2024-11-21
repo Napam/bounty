@@ -5,6 +5,7 @@ import inquirer from 'inquirer';
 import { NorwegianHoliday } from '../core/holidays.js';
 import { ISODateToDate, isoDateRegex, Day } from '../core/dates.js';
 import * as yup from 'yup';
+import { replaceEnvPlaceholders } from '../core/placeholders.js';
 
 /**
  * Core Bounty config file that is unprocessed / parsed
@@ -23,7 +24,7 @@ import * as yup from 'yup';
  * Core Bounty config file
  * @typedef {Object} BountyConfig
  * @property {string} version
- * @property {'harvest' | 'clockify'} integration
+ * @property {'harvest' | 'clockify' | 'xledger'} integration
  * @property {Date} referenceDate - this is a date where you know what your flex balance was
  * @property {number} referenceBalance - Your flex balance at the reference date
  * @property {Day[]} workdays - Your workdays
@@ -51,7 +52,7 @@ import * as yup from 'yup';
 
 export const configSchema = yup.object().shape({
   version: yup.string().required(),
-  integration: yup.string().oneOf(['harvest', 'clockify']).required(),
+  integration: yup.string().oneOf(['harvest', 'clockify', 'xledger']).required(),
   referenceDate: yup.string().required(),
   referenceBalance: yup.number().required(),
   workdays: yup
@@ -142,7 +143,8 @@ export async function initalizeBountyConfig() {
   let oldHarvestConfig = null;
 
   if (config != null && !isOldHarvestConfig) {
-    return validateAndProcessBountyConfig(config);
+    const validated = validateAndProcessBountyConfig(config);
+    return replaceEnvPlaceholders(process.env, validated, BOUNTY_CORE_CONFIG_FILE);
   }
 
   if (isOldHarvestConfig) {
@@ -321,7 +323,7 @@ export async function initalizeBountyConfig() {
     hoursOnSpecificHolidays: config.hoursOnSpecificHolidays,
   };
 
-  const validatedconfig = validateAndProcessBountyConfig(orderedConfig);
+  const validatedConfig = validateAndProcessBountyConfig(orderedConfig);
 
   console.log();
   console.log(`Core config \x1b[32msuccessfully\x1b[m updated at \x1b[33m${BOUNTY_CORE_CONFIG_FILE}\x1b[m`);
@@ -341,5 +343,5 @@ export async function initalizeBountyConfig() {
   }
 
   fs.writeFileSync(BOUNTY_CORE_CONFIG_FILE, JSON.stringify(orderedConfig, null, 2));
-  return validatedconfig;
+  return replaceEnvPlaceholders(process.env, validatedConfig, BOUNTY_CORE_CONFIG_FILE);
 }

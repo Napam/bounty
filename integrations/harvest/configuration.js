@@ -2,6 +2,7 @@ import fs from 'fs';
 import { HARVEST_CONFIG_FILE } from './constants.js';
 import yup from 'yup';
 import inquirer from 'inquirer';
+import { replaceEnvPlaceholders } from '../../core/placeholders.js';
 
 /**
  * @typedef {Object} HarvestEntryFilter
@@ -72,7 +73,8 @@ export async function setupFilesInHomeAndPromptForInfo() {
   }
 
   if (currConfig === initConfig) {
-    return validateHarvestConfig(initConfig);
+    const validated = validateHarvestConfig(initConfig);
+    return replaceEnvPlaceholders(process.env, validated, HARVEST_CONFIG_FILE);
   }
   const validatedConfig = validateHarvestConfig(currConfig);
   console.log();
@@ -90,7 +92,7 @@ export async function setupFilesInHomeAndPromptForInfo() {
     process.exit(0);
   }
   setConfig(validatedConfig);
-  return validatedConfig;
+  return replaceEnvPlaceholders(process.env, validatedConfig, HARVEST_CONFIG_FILE);
 }
 
 /** @type {ClockifyConfig | null} */

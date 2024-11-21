@@ -1,0 +1,38 @@
+meta {
+  name: Get entries
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: https://www.xledger.net/graphql
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  query GetTimeEntries($first: Int = 100, $employeeId: Int = 32697660) {
+    timesheets(
+      first: $first
+      filter: {
+        employeeDbId: $employeeId
+        assignmentDate_gt: "2024-11-18"
+        dbId_gt: 0
+      }
+    ) {
+      edges {
+        node {
+          dbId
+          text
+          workingHours
+          employee {
+            email
+            dbId
+          }
+        }
+        cursor
+      }
+    }
+  }
+  
+}

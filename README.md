@@ -3,8 +3,8 @@
 A tool to calculate flex balance for time tracker programs that does not
 have flex balance tracking 🙃
 
-Internally all this program does is calculating the difference between the 
-actual end expected work hours. The tricky parts that Bounty handles are 
+Internally all this program does is calculating the difference between the
+actual end expected work hours. The tricky parts that Bounty handles are
 holidays, weekends, registered hours that should be ignored (such as overtime).
 
 ### Features:
@@ -25,7 +25,7 @@ holidays, weekends, registered hours that should be ignored (such as overtime).
 
 # Requirements
 
-- Node v15 or higher
+- Node v18 or higher
 - npm
 
 # Install / Update
@@ -260,3 +260,46 @@ Config values:
 
   The `projectName`, `clientName` and `label` values must match exactly what has
   been registered in Clockify.
+
+### XLedger
+
+NOTE: XLedger does not have any filtering possibilities. It theoretically can,
+but I haven't needed it yet.
+
+- **version**: Has the same role as in the Harvest config.
+
+- **apiKey**: XLedger API Key. You need to obtain this from someone who can make
+  API Keys (i think so at least, I have haven't figured out how to generate a
+  personal one)
+
+- **employeeId**: XLedger employee id. This is XLedger's internal database id,
+  not sure how exposed it is in the GUI, I got it through the GraphQL API for
+  timesheets.
+
+## Environment variable injection
+
+In case you want to commit your stuff into vcs you may not want to expose
+everything in the vcs (e.g. api keys or sensitive information). Thus, there is
+implemented functionality do "environment variable injection" into all the
+configs. Here is an example:
+
+1. You have the environment variable `XLEDGER_API_KEY=123`
+1. You can then specify in the XLedger config:
+
+```json
+{
+  "version": "1",
+  "apiKey": "${XLEDGER_API_KEY}",
+  "employeeId": 42069
+}
+```
+
+The injection forks by replacing `${THIS_PATTERN_RIGHT_HERE}` with the
+corresponding environment variable.
+
+A way I like to use this is I have an alias:
+
+```sh
+# pass is my password manager
+alias xbounty='XLEDGER_API_KEY=$(pass apikeys/xledger) bounty'
+```
