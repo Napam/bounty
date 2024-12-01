@@ -68,7 +68,7 @@ export async function* timeEdgeGenerator(headers, employeeId, from) {
       }
     } catch (error) {
       console.log(`\x1b[31mAn error occured when attempting to get data from XLedger\x1b[0m`);
-      console.log('Response from XLedger:', data.errors);
+      console.log('Response from XLedger:', data?.errors);
       console.log(`Are the values in \x1b[33m${XLEDGER_CONFIG_FILE}\x1b[0m correct?`);
       console.error('Error:', error);
       process.exit(1);
