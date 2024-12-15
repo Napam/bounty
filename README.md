@@ -20,6 +20,7 @@ holidays, weekends, registered hours that should be ignored (such as overtime).
     of now Bounty supports:
     - Harvest
     - Clockify
+    - XLedger
   - Send PR or create an issue if you want integration to something else.
     - Or you can fork this project and do whatever really, it's MIT licensed.
 
