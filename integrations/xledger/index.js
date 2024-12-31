@@ -23,10 +23,15 @@ function gql(literals, ...values) {
  */
 
 const getTimeEntriesGql = gql`
-  query GetTimeEntries($first: Int, $from: String, $employeeId: Int, $cursor: Int64String) {
+  query GetTimeEntries($first: Int, $from: String, $to: String, $employeeId: Int, $cursor: Int64String) {
     timesheets(
       first: $first
-      filter: { employeeDbId: $employeeId, assignmentDate_gte: $from, dbId_gt: $cursor }
+      filter: {
+        employeeDbId: $employeeId
+        assignmentDate_gte: $from
+        assignmentDate_lte: $to
+        dbId_gt: $cursor
+      }
     ) {
       edges {
         node {
@@ -39,16 +44,18 @@ const getTimeEntriesGql = gql`
 `;
 
 /**
- * @param {object} headers - headers to send to harvest
- * @param {number} employeeId - headers to send to harvest
- * @param {string} from - headers to send to harvest
+ * @param {object} headers
+ * @param {number} employeeId
+ * @param {string} from
+ * @param {string} to
  * @returns {AsyncGenerator<XLedgerEdge, void, *>}
  */
-export async function* timeEdgeGenerator(headers, employeeId, from) {
+export async function* timeEdgeGenerator(headers, employeeId, from, to) {
   const variables = {
     first: 10_000,
     employeeId,
     from,
+    to,
     cursor: 0,
   };
 
@@ -90,18 +97,19 @@ export async function* timeEdgeGenerator(headers, employeeId, from) {
  * @param {Date} from
  * @param {Date} to
  */
-export async function getWorkHours(from) {
+export async function getWorkHours(from, to) {
   const config = await setupFilesInHomeAndPromptForInfo();
   const headers = {
     Authorization: `token ${config.apiKey}`,
     'Content-Type': 'application/json',
   };
   const fromString = dates.dateToISODateWithoutOffset(from);
+  const toString = dates.dateToISODateWithoutOffset(to);
 
   const pattern = /^\d+\.\d+$/;
 
   let hours = 0;
-  for await (let { node } of timeEdgeGenerator(headers, config.employeeId, fromString)) {
+  for await (let { node } of timeEdgeGenerator(headers, config.employeeId, fromString, toString)) {
     if (!pattern.test(node.workingHours)) {
       console.error(`Invalid working hours string: ${node.workingHours}`);
       process.exit(1);

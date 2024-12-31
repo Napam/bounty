@@ -37,6 +37,12 @@ async function run() {
 
   const from = incrementDateIfBeforeToday(bountyConfig.referenceDate);
   const to = getTodayDate();
+
+  const referenceDateIsToday = from.getTime() === to.getTime();
+  if (referenceDateIsToday) {
+    return await afterRun({ from, to, balance: bountyConfig.referenceBalance });
+  }
+
   const workedHours = await getWorkHours(from, to);
   const { referenceBalance, workdays, hoursOnWorkdays, hoursOnHolidays, hoursOnSpecificHolidays } =
     bountyConfig;
