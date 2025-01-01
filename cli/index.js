@@ -38,7 +38,7 @@ async function run() {
   const from = incrementDateIfBeforeToday(bountyConfig.referenceDate);
   const to = getTodayDate();
 
-  const referenceDateIsToday = from.getTime() === to.getTime();
+  const referenceDateIsToday = bountyConfig.referenceDate.getTime() === to.getTime();
   if (referenceDateIsToday) {
     return await afterRun({ from, to, balance: bountyConfig.referenceBalance });
   }
